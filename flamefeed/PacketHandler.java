@@ -21,10 +21,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
-import net.minecraft.world.WorldSavedData;
 
 /**
  *
@@ -82,7 +81,7 @@ public class PacketHandler implements IPacketHandler {
         sqlQuery += " AND y BETWEEN " + data.get("yMin") + " AND " + data.get("yMax");
         sqlQuery += " AND z BETWEEN " + data.get("zMin") + " AND " + data.get("zMax");
         sqlQuery += " AND time BETWEEN '" + data.get("dateMin") + "' AND '" + data.get("dateMax")+"'";
-        sqlQuery += " AND world = '" + FMLCommonHandler.instance().getMinecraftServerInstance().getWorldName()+"/"+data.get("dim")+"'";
+        sqlQuery += " AND world = '" + ((EntityPlayer)player).worldObj.getWorldInfo().getWorldName()+"/"+data.get("dim")+"'";
         
         sqlQuery += " ORDER BY time DESC;";
         

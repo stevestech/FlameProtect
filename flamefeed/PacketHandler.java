@@ -86,6 +86,8 @@ public class PacketHandler implements IPacketHandler {
         sqlQuery += " ORDER BY time DESC;";
         
         ResultSet resultSet = SQLHandler.executeQuery(sqlQuery);
+        
+        if (resultSet==null)return;
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream(1);
         DataOutputStream outputStream = new DataOutputStream(bos);

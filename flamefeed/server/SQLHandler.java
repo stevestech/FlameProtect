@@ -96,6 +96,7 @@ public class SQLHandler {
     }
     
     public static ResultSet executeQuery(String query){
+        if(con==null) return null;
     
         EventLogger.log(Level.INFO, "executing " + query);
         try {

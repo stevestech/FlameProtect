@@ -50,7 +50,7 @@ public class ProtectEventHandler {
     }
 
     private boolean hasPermission(EntityPlayer player, String event) {
-        if (Server.enabled == false) {
+        if (Server.enabled == false || player.worldObj.isRemote) {
             return true;
         }
         

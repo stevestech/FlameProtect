@@ -10,11 +10,11 @@ import flamefeed.server.log.EventLogger;
 import flamefeed.server.log.LogEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -22,7 +22,8 @@ import java.util.logging.Logger;
  */
 public class SQLHandler {
     
-    private static Connection con;
+    private static Statement sql;
+    private static PreparedStatement sqlAddEntry;
     
     private static final java.text.SimpleDateFormat sdf
             = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -31,8 +32,8 @@ public class SQLHandler {
         EventLogger.log(Level.INFO, "initializing SQL");
         try {
             //establish connection
-            con = DriverManager.getConnection("jdbc:mysql://" + Server.SQL.host + "/" + Server.SQL.database, Server.SQL.user, Server.SQL.pw);
-            Statement sql = con.createStatement();
+            Connection con = DriverManager.getConnection("jdbc:mysql://" + Server.SQL.host + "/" + Server.SQL.database, Server.SQL.user, Server.SQL.pw);
+            sql = con.createStatement();
 
             //create table
             EventLogger.log(Level.INFO, "creating Table logEntries");
@@ -41,13 +42,16 @@ public class SQLHandler {
                     + "y INT,"
                     + "z INT"
                     + ")");
-            addSQLColumn(sql, "world", "VARCHAR(20)");
-            addSQLColumn(sql, "time", "DATETIME");
-            addSQLColumn(sql, "source", "VARCHAR(20)");
-            addSQLColumn(sql, "target", "VARCHAR(20)");
-            addSQLColumn(sql, "action", "VARCHAR(20)");
-            addSQLColumn(sql, "tool", "VARCHAR(20)");
-            sql.close();
+            addSQLColumn("world", "VARCHAR(20)");
+            addSQLColumn("time", "DATETIME");
+            addSQLColumn("source", "VARCHAR(20)");
+            addSQLColumn("target", "VARCHAR(20)");
+            addSQLColumn("action", "VARCHAR(5)");
+            addSQLColumn("tool", "VARCHAR(20)");
+            
+            sqlAddEntry = con.prepareStatement("INSERT INTO logEntries "+
+                    "(time,x,y,z,source,target,action,tool,world)"+
+                    " VALUES(?,?,?,?,?,?,?,?,?);");
         } catch (SQLException ex) {
             EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
             EventLogger.log(Level.SEVERE, "SQL logging has been disabled");
@@ -55,7 +59,7 @@ public class SQLHandler {
         }
     }
     
-    private static void addSQLColumn(Statement sql, String name, String type) {
+    private static void addSQLColumn(String name, String type) {
         try {
             sql.executeUpdate("ALTER TABLE logEntries ADD " + name + " " + type);
         } catch (SQLException ex) {
@@ -64,28 +68,29 @@ public class SQLHandler {
     }
     
     public static void log(LogEvent e) {
-        String source = cut(e.source, 20);
-        String target = cut(e.target, 20);
-        String action = cut(e.action, 20);
-        String tool = cut(e.tool, 20);
-        String world = cut(e.world, 20);
-        String time = sdf.format(e.time);
         try {
-            Statement sql = con.createStatement();
-            String query = "INSERT INTO logEntries (time,x,y,z,source,target,action,tool,world)"
-                    + " VALUES('"
-                    + time + "',"
-                    + e.x + ","
-                    + e.y + ","
-                    + e.z + ",'"
-                    + source + "','"
-                    + target + "','"
-                    + action + "','"
-                    + tool + "','"
-                    + world + "');";
-            sql.executeUpdate(query);
-            sql.close();
+        //time
+        sqlAddEntry.setString(1, sdf.format(e.time));
+        //x
+        sqlAddEntry.setInt(2, e.x);
+        //y
+        sqlAddEntry.setInt(3, e.y);
+        //z
+        sqlAddEntry.setInt(4, e.z);
+        //source
+        sqlAddEntry.setString(5, cut(e.source, 20));
+        //target
+        sqlAddEntry.setString(6, cut(e.target, 20));
+        //action
+        sqlAddEntry.setString(7, cut(e.action, 5));
+        //tool
+        sqlAddEntry.setString(8, cut(e.tool, 20));
+        //world
+        sqlAddEntry.setString(9, cut(e.world, 20));
+        
+        sqlAddEntry.executeUpdate();
 
+        sqlAddEntry.clearParameters();
         } catch (SQLException ex) {
             EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
         }
@@ -96,13 +101,11 @@ public class SQLHandler {
     }
     
     public static ResultSet executeQuery(String query){
-        if(con==null) return null;
+        if(sql==null) return null;
     
         EventLogger.log(Level.INFO, "executing " + query);
         try {
-            Statement sql = con.createStatement();
             ResultSet result = sql.executeQuery(query);
-            sql.closeOnCompletion();
 //            result.next();
 //        EventLogger.log(Level.INFO, "first result time:" + result.getString("time"));
             return result;

@@ -37,7 +37,7 @@ public class EventLogger {
 
     public static void log(LogEvent e, byte output) {
 
-        if ((output & 1) != 0) {
+        if ((output & 1) != 0 && Server.Log.console) {
             logger.log(Level.INFO, "Logged Event: {0}, Source: {1}, Target: {2}, Tool: {3},World: {4}, Coordinates: {5}, {6}, {7}",
                     new Object[]{e.action, e.source, e.target, e.tool, e.world, e.x, e.y, e.z});
         }

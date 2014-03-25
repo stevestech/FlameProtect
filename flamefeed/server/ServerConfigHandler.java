@@ -52,6 +52,7 @@ Server.logCmd = FConfig.get(protCategory, "logCommand", Server.logCmd_default,
 String logCategory = "Logging";
 FConfig.addCustomCategoryComment(logCategory, "Enables/Disables logging of certain Events. 0=OFF, 1=Console, 2=SQL, 3=Both");
 
+Server.Log.console = FConfig.get(logCategory, "consoleLog", true).getBoolean(true);
 Server.Log.blockBreak = (byte)FConfig.get(logCategory, "BlockBreak", 3).getInt();
 Server.Log.leftBlock = (byte)FConfig.get(logCategory, "LeftClickBlock", 3).getInt();
 Server.Log.rightBlock = (byte)FConfig.get(logCategory, "RightClickBlock", 3).getInt();

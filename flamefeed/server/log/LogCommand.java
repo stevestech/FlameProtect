@@ -56,6 +56,16 @@ public class LogCommand implements ICommand {
                 Server.SQL.enabled = Boolean.parseBoolean(astring[1]);
                 icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("SQL-Logging: " + Server.SQL.enabled + ""));
             }
+        } else if ("console".compareTo(astring[0]) == 0) {
+            //console log command
+            if (astring.length < 2
+                    || ("true".compareTo(astring[1]) != 0 && "false".compareTo(astring[1]) != 0)) {
+                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Console-Logging: " + Server.Log.console + "\n"
+                        + "/" + Server.logCmd + " console [true/false]"));
+            } else {
+                Server.Log.console = Boolean.parseBoolean(astring[1]);
+                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Console-Logging: " + Server.Log.console + ""));
+            }
         } else if ("subscribe".compareTo(astring[0]) == 0) {
             //subscribe command
             if (astring.length > 2) {

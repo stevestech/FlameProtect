@@ -75,7 +75,7 @@ public class PacketHandler implements IPacketHandler {
             EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
         }
 
-        String sqlQuery = "SELECT * FROM logentries WHERE";
+        String sqlQuery = "SELECT * FROM logEntries WHERE";
 
         sqlQuery += " x BETWEEN " + data.get("xMin") + " AND " + data.get("xMax");
         sqlQuery += " AND y BETWEEN " + data.get("yMin") + " AND " + data.get("yMax");

@@ -20,6 +20,7 @@ public class Server {
     }
     
     public static class Log{
+        public static boolean console;
         public static byte blockBreak;
         public static byte leftBlock;
         public static byte rightBlock;

@@ -7,8 +7,6 @@ package flamefeed.client;
 
 import cpw.mods.fml.common.network.PacketDispatcher;
 import flamefeed.client.SQLResult.SQLResultRow;
-import flamefeed.server.SQLHandler;
-import flamefeed.server.log.EventLogger;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

@@ -9,7 +9,6 @@ import flamefeed.server.Server;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import cpw.mods.fml.common.FMLLog;
-import flamefeed.server.SQLHandler;
 import java.util.HashMap;
 import net.minecraft.command.ICommandSender;
 

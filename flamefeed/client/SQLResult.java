@@ -6,11 +6,10 @@
 package flamefeed.client;
 
 import flamefeed.PacketHandler;
-import flamefeed.server.SQLHandler;
+import flamefeed.server.log.SQLHandler;
 import flamefeed.server.log.EventLogger;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

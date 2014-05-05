@@ -103,24 +103,35 @@ public class SQLHandler {
         //logs events to the database
         public static void log(LogEvent e) {
             try {
-                //time
-                sqlAddEntry.setString(1, sdf.format(e.time));
+                int i = 0;
                 //x
-                sqlAddEntry.setInt(2, e.x);
+                sqlAddEntry.setInt(++i, e.x);
                 //y
-                sqlAddEntry.setInt(3, e.y);
+                sqlAddEntry.setInt(++i, e.y);
                 //z
-                sqlAddEntry.setInt(4, e.z);
-                //source
-                sqlAddEntry.setString(5, cut(e.source, 20));
-                //target
-                sqlAddEntry.setString(6, cut(e.target, 20));
-                //action
-                sqlAddEntry.setString(7, cut(e.action, 5));
-                //tool
-                sqlAddEntry.setString(8, cut(e.tool, 20));
+                sqlAddEntry.setInt(++i, e.z);
                 //world
-                sqlAddEntry.setString(9, cut(e.world, 20));
+                sqlAddEntry.setString(++i, cut(e.world, 20));
+                //time
+                sqlAddEntry.setString(++i, sdf.format(e.time));
+                //source
+                sqlAddEntry.setString(++i, cut(e.source, 20));
+                //targetID
+                sqlAddEntry.setString(++i, cut(e.getTargetID(), 10));
+                //targetN
+                sqlAddEntry.setInt(++i, e.targetN);
+                //targetName
+                sqlAddEntry.setString(++i, cut(e.getTargetName(), 30));
+                //action
+                sqlAddEntry.setString(++i, cut(e.action, 5));
+                //toolID
+                sqlAddEntry.setString(++i, cut(e.getToolID(), 10));
+                //toolN
+                sqlAddEntry.setInt(++i, e.toolN);
+                //toolName
+                sqlAddEntry.setString(++i, cut(e.getToolName(), 30));
+                //sneak
+                sqlAddEntry.setBoolean(++i, e.isSneaking);
 
                 sqlAddEntry.executeUpdate();
 
@@ -178,21 +189,20 @@ public class SQLHandler {
 
             try {
                 while (resultSet.next()) {
-                    outputStream.writeUTF(resultSet.getString("time"));
-                    outputStream.writeUTF(",");
-                    outputStream.writeUTF(resultSet.getString("x"));
-                    outputStream.writeUTF(",");
-                    outputStream.writeUTF(resultSet.getString("y"));
-                    outputStream.writeUTF(",");
-                    outputStream.writeUTF(resultSet.getString("z"));
-                    outputStream.writeUTF(",");
-                    outputStream.writeUTF(resultSet.getString("source"));
-                    outputStream.writeUTF(",");
-                    outputStream.writeUTF(resultSet.getString("action"));
-                    outputStream.writeUTF(",");
-                    outputStream.writeUTF(resultSet.getString("target"));
-                    outputStream.writeUTF(",");
-                    outputStream.writeUTF(resultSet.getString("tool"));
+                    addToStream(outputStream, resultSet, new String[]{"x",
+                        "y",
+                        "z",
+                        "world",
+                        "time",
+                        "source",
+                        "targetID",
+                        "targetN",
+                        "targetName",
+                        "action",
+                        "toolID",
+                        "toolN",
+                        "toolName",
+                        "sneak"});
                     outputStream.writeUTF(";");
                 }
                 resultSet.close();
@@ -212,6 +222,25 @@ public class SQLHandler {
             PacketDispatcher.sendPacketToPlayer(resultPacket, player);
 
         }
+
+        private static void addToStream(DataOutputStream out, ResultSet res, String[] fields) {
+            for (String field : fields) {
+                addToStream(out, res, field);
+            }
+        }
+
+        private static void addToStream(DataOutputStream out, ResultSet res, String field) {
+            try {
+                String value = res.getString(field);
+                if (value != null && !value.equals("")) {
+                    out.writeUTF(field + "=" + value + ",");
+                }
+            } catch (IOException ex) {
+                EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
+            } catch (SQLException ex) {
+                EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
+            }
+        }
     } //End of SQLHandlerThread
 
     /*    
@@ -229,26 +258,132 @@ public class SQLHandler {
         EventLogger.log(Level.INFO, "initializing SQL");
         try {
             //establish connection
-            Connection con = DriverManager.getConnection("jdbc:mysql://" + Server.SQL.host + "/" + Server.SQL.database, Server.SQL.user, Server.SQL.pw);
+            Connection con = DriverManager.getConnection(
+                    "jdbc:mysql://" + Server.SQL.host + "/" + Server.SQL.database,
+                    Server.SQL.user, Server.SQL.pw);
             sql = con.createStatement();
 
-            //create table
-            EventLogger.log(Level.INFO, "creating Table logEntries");
-            sql.executeUpdate("CREATE TABLE IF NOT EXISTS logEntries ("
-                    + "x INT,"
-                    + "y INT,"
-                    + "z INT"
-                    + ")");
-            addSQLColumn("world", "VARCHAR(20)");
-            addSQLColumn("time", "DATETIME");
-            addSQLColumn("source", "VARCHAR(20)");
-            addSQLColumn("target", "VARCHAR(20)");
-            addSQLColumn("action", "VARCHAR(5)");
-            addSQLColumn("tool", "VARCHAR(20)");
+            //check if table exists
+            ////metaInfo
+            ResultSet schemaRS = sql.executeQuery(
+                    "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '"
+                    + Server.SQL.database + "'  AND table_name = 'metaInfo';");
+            schemaRS.next();
+            boolean metaExists = (schemaRS.getInt(1) == 1);
+            schemaRS.close();
+            EventLogger.log(Level.INFO, "Table metaInfo existing: " + metaExists);
+            ////LogEntries
+            schemaRS = sql.executeQuery(
+                    "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '"
+                    + Server.SQL.database + "'  AND table_name = 'logEntries';");
+            schemaRS.next();
+            boolean logExists = (schemaRS.getInt(1) == 1);
+            schemaRS.close();
+            EventLogger.log(Level.INFO, "Table logEntries existing: " + logExists);
+
+            int version = 0;
+
+            if (!metaExists) {
+                //create metaInfo with version 0
+
+                EventLogger.log(Level.INFO, "metaInfo does not exist. creating with version 0");
+
+                sql.executeUpdate("CREATE TABLE IF NOT EXISTS metaInfo ("
+                        + "k VARCHAR(10),"
+                        + "v VARCHAR(10))");
+
+                sql.executeUpdate("INSERT INTO metaInfo "
+                        + "(k,v)"
+                        + " VALUES('version','0');");
+
+                //logEntries already existing -> thats version 1
+                if (logExists) {
+                    version = 1;
+                }
+
+            } else {
+                //get version from metaInfo
+                ResultSet versionRS = sql.executeQuery("SELECT v FROM metaInfo WHERE k='version'");
+                versionRS.next();
+                version = versionRS.getInt(1);
+
+                EventLogger.log(Level.INFO, "metaInfo found. Version " + version);
+            }
+
+            if (!logExists) {
+                //create table
+                EventLogger.log(Level.INFO, "creating Table logEntries");
+                sql.executeUpdate("CREATE TABLE IF NOT EXISTS logEntries ("
+                        + "x INT,"
+                        + "y INT,"
+                        + "z INT"
+                        + ")");
+
+                addSQLColumn("world", "VARCHAR(20)");
+                addSQLColumn("time", "DATETIME");
+                addSQLColumn("source", "VARCHAR(20)");
+                addSQLColumn("targetID", "VARCHAR(10) AFTER source");
+                addSQLColumn("targetN", "SMALLINT AFTER targetID");
+                addSQLColumn("targetName", "VARCHAR(30)");
+                addSQLColumn("action", "VARCHAR(5)");
+                addSQLColumn("toolID", "VARCHAR(10) AFTER action");
+                addSQLColumn("toolN", "SMALLINT AFTER toolID");
+                addSQLColumn("toolName", "VARCHAR(30)");
+                addSQLColumn("sneak", "BIT");
+
+            } else {
+                //update from previous versions, dont use break; here
+                switch (version) {
+                    case 0:
+                    //whoops, that shouldnt happen. Sit an hope...
+
+                    case 1:
+                        //logEntries exists, but no metaInfo
+                    /* Current table structure:
+                         x INT
+                         y INT
+                         z INT
+                         world VARCHAR(20)
+                         time DATETIME
+                         source VARCHAR(20)
+                         target VARCHAR(20)
+                         action VARCHAR(5)
+                         tool VARCHAR(20)
+                         */
+                        addSQLColumn("targetID", "VARCHAR(10) AFTER source");
+                        addSQLColumn("targetN", "SMALLINT AFTER targetID");
+                        changeSQLColumn("target", "targetName", "VARCHAR(30)");
+                        addSQLColumn("toolID", "VARCHAR(10) AFTER action");
+                        addSQLColumn("toolN", "SMALLINT AFTER toolID");
+                        changeSQLColumn("tool", "toolName", "VARCHAR(30)");
+                        addSQLColumn("sneak", "BIT");
+
+                    case 2:
+                    //current version
+                    /* Current table structure:
+                     x INT
+                     y INT
+                     z INT
+                     world VARCHAR(20)
+                     time DATETIME
+                     source VARCHAR(20)
+                     targetID VARCHAR(10)
+                     targetN SMALLINT
+                     targetName VARCHAR(30)
+                     action VARCHAR(5)
+                     toolID VARCHAR(10)
+                     toolN SMALLINT
+                     toolName VARCHAR(30)
+                     sneak BIT(1)
+                     */
+                }
+            }
+
+            sql.executeUpdate("UPDATE metaInfo SET v = 2 WHERE k = 'version';");
 
             sqlAddEntry = con.prepareStatement("INSERT INTO logEntries "
-                    + "(time,x,y,z,source,target,action,tool,world)"
-                    + " VALUES(?,?,?,?,?,?,?,?,?);");
+                    + "(x,y,z,world,time,source,targetID,targetN,targetName,action,toolID,toolN,toolName,sneak)"
+                    + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
             thread = new SQLHandlerThread();
             thread.setName("SQLHandlerThread");
@@ -280,6 +415,18 @@ public class SQLHandler {
     private static void addSQLColumn(String name, String type) {
         try {
             sql.executeUpdate("ALTER TABLE logEntries ADD " + name + " " + type);
+        } catch (SQLException ex) {
+            EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
+        }
+    }
+
+    private static void changeSQLColumn(String name, String type) {
+        changeSQLColumn(name, name, type);
+    }
+
+    private static void changeSQLColumn(String oldName, String newName, String type) {
+        try {
+            sql.executeUpdate("ALTER TABLE logEntries CHANGE " + oldName + " " + newName + " " + type + ";");
         } catch (SQLException ex) {
             EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
         }

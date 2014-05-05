@@ -37,8 +37,11 @@ public class EventLogger {
     public static void log(LogEvent e, byte output) {
 
         if ((output & 1) != 0 && Server.Log.console) {
-            logger.log(Level.INFO, "Logged Event: {0}, Source: {1}, Target: {2}, Tool: {3},World: {4}, Coordinates: {5}, {6}, {7}",
-                    new Object[]{e.action, e.source, e.target, e.tool, e.world, e.x, e.y, e.z});
+            logger.log(Level.INFO, 
+                "Logged Event: [{0},{1},{2},{3}] {4}: {5} {6}x{7} ({8}) with {9}x{10} ({11})",
+                    new Object[]{e.world, e.x, e.y, e.z, e.source, e.action,
+                        e.targetN, e.getTargetID(), e.getTargetName(),
+                        e.toolN, e.getToolID(), e.getToolName()});
         }
 
         if ((output & 2) != 0 && Server.SQL.enabled) {

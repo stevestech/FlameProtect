@@ -27,6 +27,9 @@ public class Server {
         public static byte rightAir;
         public static byte pickup;
     }
+    public static String whatCmd;
+    public static String whatCmd_default="what";
+    
     public static String logCmd;
     public static String logCmd_default="log";
 

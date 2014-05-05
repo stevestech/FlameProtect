@@ -124,19 +124,19 @@ class GuiSQL extends GuiScreen {
         fontRenderer.drawString("z", xAnchor + 195, curY, 0x000000, false);
         fontRenderer.drawString("source", xAnchor + 225, curY, 0x000000, false);
         fontRenderer.drawString("action", xAnchor + 300, curY, 0x000000, false);
-        fontRenderer.drawString("target", xAnchor + 340, curY, 0x000000, false);
-        fontRenderer.drawString("tool", xAnchor + 400, curY, 0x000000, false);
+        fontRenderer.drawString("targetName", xAnchor + 340, curY, 0x000000, false);
+        fontRenderer.drawString("toolName", xAnchor + 400, curY, 0x000000, false);
         curY += sqlRowHeight;
 
         for (SQLResultRow row : SQLResult.rows) {
-            fontRenderer.drawString(row.time, xAnchor, curY, 0x000000, false);
-            fontRenderer.drawString(row.x, xAnchor + 135, curY, 0x000000, false);
-            fontRenderer.drawString(row.y, xAnchor + 165, curY, 0x000000, false);
-            fontRenderer.drawString(row.z, xAnchor + 195, curY, 0x000000, false);
-            fontRenderer.drawString(row.source, xAnchor + 225, curY, 0x000000, false);
-            fontRenderer.drawString(row.action, xAnchor + 300, curY, 0x000000, false);
-            fontRenderer.drawString(row.target, xAnchor + 340, curY, 0x000000, false);
-            fontRenderer.drawString(row.tool, xAnchor + 400, curY, 0x000000, false);
+            fontRenderer.drawString(row.get("time"), xAnchor, curY, 0x000000, false);
+            fontRenderer.drawString(row.get("x"), xAnchor + 135, curY, 0x000000, false);
+            fontRenderer.drawString(row.get("y"), xAnchor + 165, curY, 0x000000, false);
+            fontRenderer.drawString(row.get("z"), xAnchor + 195, curY, 0x000000, false);
+            fontRenderer.drawString(row.get("source"), xAnchor + 225, curY, 0x000000, false);
+            fontRenderer.drawString(row.get("action"), xAnchor + 300, curY, 0x000000, false);
+            fontRenderer.drawString(row.get("targetName"), xAnchor + 340, curY, 0x000000, false);
+            fontRenderer.drawString(row.get("toolName"), xAnchor + 400, curY, 0x000000, false);
             curY += sqlRowHeight;
             if (curY > 0.8F * height) {
                 break;

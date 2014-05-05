@@ -21,6 +21,11 @@ Configuration FConfig = new Configuration(configFile);
 
 FConfig.load();
 
+//what Command
+
+Server.whatCmd = FConfig.get(Configuration.CATEGORY_GENERAL, "whatCommand", Server.whatCmd_default,
+        "Displays informations about the current held item.").getString();
+
 
 //Protection
 String protCategory = "Protection";

@@ -6,9 +6,11 @@
 package flamefeed.server.log;
 
 import flamefeed.server.Server;
+import java.util.HashMap;
 import java.util.logging.Level;
 import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
+import net.minecraftforge.event.Event;
+import static net.minecraftforge.event.EventPriority.HIGHEST;
 import static net.minecraftforge.event.EventPriority.LOWEST;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -22,6 +24,8 @@ import net.minecraftforge.event.world.BlockEvent.BreakEvent;
  */
 public class LogEventHandler {
 
+    private HashMap<Event, LogEvent> eventMap = new HashMap();
+
     @ForgeSubscribe(priority = LOWEST)
     public void onBlockBreak(BreakEvent event) {
         if (event.world.isRemote || (!Server.Log.console && !Server.SQL.enabled)) {
@@ -30,14 +34,20 @@ public class LogEventHandler {
 
         LogEvent log = new LogEvent();
 
-        log.x = event.x;
-        log.y = event.y;
-        log.z = event.z;
-        log.world = event.world.getWorldInfo().getWorldName() + "/"
-                + event.getPlayer().dimension;
+        log.setPosition(event.x, event.y, event.z);
 
-        log.source = event.getPlayer().getEntityName();
-        log.target = event.block.getLocalizedName();
+        if (event.getPlayer() != null) {
+            log.world = event.world.getWorldInfo().getWorldName() + "/"
+                    + event.getPlayer().dimension;
+
+            log.setSource(event.getPlayer());
+        }
+
+        if (event.block!=null)
+            log.targetID = event.block.blockID;
+        log.targetDamage = event.blockMetadata;
+        log.targetN = 1;
+
         log.action = "break";
 
         EventLogger.log(log, Server.Log.blockBreak);
@@ -52,39 +62,27 @@ public class LogEventHandler {
 
         LogEvent log = new LogEvent();
 
-        log.source = event.entityPlayer.getEntityName();
-        log.x = event.x;
-        log.y = event.y;
-        log.z = event.z;
+        log.setSource(event.entityPlayer);
+        log.setPosition(event.x, event.y, event.z);
         log.world = event.entityPlayer.worldObj.getWorldInfo().getWorldName() + "/"
                 + event.entityPlayer.dimension;
 
-        ItemStack toolStack = event.entityPlayer.getCurrentEquippedItem();
-        if (toolStack == null) {
-            log.tool = "hands";
-        } else {
-            log.tool = event.entityPlayer.getCurrentEquippedItem().getUnlocalizedName();
-        }
-
         if (event.action == Action.RIGHT_CLICK_AIR) { //Use Item
 
-            log.target = "air";
             log.action = "use";
 
-            log.x = (int) event.entityPlayer.posX;
-            log.y = (int) event.entityPlayer.posY;
-            log.z = (int) event.entityPlayer.posZ;
+            log.setPosition(event.entityPlayer);
 
             EventLogger.log(log, Server.Log.rightAir);
 
         } else if (event.action == Action.RIGHT_CLICK_BLOCK) { //Use Item on Block
 
             try {
-                Block targetBlock = Block.blocksList[event.entityPlayer.worldObj.getBlockId(event.x, event.y, event.z)];
-                log.target = targetBlock.getLocalizedName();
+                log.targetID = event.entityPlayer.worldObj.getBlockId(event.x, event.y, event.z);
+                log.targetDamage = event.entityPlayer.worldObj.getBlockMetadata(event.x, event.y, event.z);
+                log.targetN = 1;
             } catch (NullPointerException e) {
                 EventLogger.log(Level.SEVERE, e.getStackTrace().toString());
-                log.target = "NPE";
             }
 
             if (false) { //Try to determine if it gets placed/used/accessed
@@ -108,10 +106,11 @@ public class LogEventHandler {
             }
 
             try {
-                log.target = Block.blocksList[event.entityPlayer.worldObj.getBlockId(event.x, event.y, event.z)].getLocalizedName();
+                log.targetID = event.entityPlayer.worldObj.getBlockId(event.x, event.y, event.z);
+                log.targetDamage = event.entityPlayer.worldObj.getBlockMetadata(event.x, event.y, event.z);
+                log.targetN = 1;
             } catch (NullPointerException e) {
                 EventLogger.log(Level.SEVERE, e.getStackTrace().toString());
-                log.target = "NPE";
             }
 
             log.action = "hit";
@@ -121,7 +120,7 @@ public class LogEventHandler {
 
     }
 
-    @ForgeSubscribe(priority = LOWEST)
+    @ForgeSubscribe(priority = HIGHEST)
     public void onEntityItemPickup(EntityItemPickupEvent event) {
         if (event.entityPlayer.worldObj.isRemote || (!Server.Log.console && !Server.SQL.enabled)) {
             return;
@@ -129,17 +128,35 @@ public class LogEventHandler {
 
         LogEvent log = new LogEvent();
 
-        log.x = (int) event.entityPlayer.posX;
-        log.y = (int) event.entityPlayer.posY;
-        log.z = (int) event.entityPlayer.posZ;
+        log.setPosition(event.entityPlayer);
         log.world = event.entityPlayer.worldObj.getWorldInfo().getWorldName() + "/"
                 + event.entityPlayer.dimension;
 
-        log.source = event.entityPlayer.getEntityName();
-        log.target = event.item.getEntityName();
+        log.setSource(event.entityPlayer);
+
+        log.targetID = event.item.getEntityItem().itemID;
+        log.targetDamage = event.item.getEntityItem().getItemDamage();
+        log.targetN = event.item.getEntityItem().stackSize;
+
         log.action = "pickup";
 
-        EventLogger.log(log, Server.Log.pickup);
+        eventMap.put(event, log);
     }
 
+    @ForgeSubscribe(priority = LOWEST, receiveCanceled = true)
+    public void onEarlyEntityItemPickup(EntityItemPickupEvent event) {
+        LogEvent log = eventMap.get(event);
+
+        if (log != null && !event.isCanceled()) {
+            EventLogger.log(log, Server.Log.pickup);
+        }
+        
+        eventMap.remove(event);
+    }
+
+    //TODO:
+    //Implement:
+    //ItemTossEvent
+    //LivingAttackEvent/LivingHurtEvent
+    //LivingDeathEvent
 }

@@ -10,6 +10,7 @@ import flamefeed.server.log.SQLHandler;
 import flamefeed.server.log.EventLogger;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,30 +20,22 @@ import java.util.logging.Logger;
  */
 public class SQLResult {
 
-    public static class SQLResultRow {
-
-        public String time;
-        public String x;
-        public String y;
-        public String z;
-        public String source;
-        public String action;
-        public String target;
-        public String tool;
+    public static class SQLResultRow extends HashMap<String,String>{
 
         public SQLResultRow(String[] str) {
-            try {
-                time = SQLHandler.cut(str[0].trim(),19);
-                x = str[1].trim();
-                y = str[2].trim();
-                z = str[3].trim();
-                source = SQLHandler.cut(str[4].trim(),10);
-                action = str[5].trim();
-                target = SQLHandler.cut(str[6].trim(),10);
-                tool = SQLHandler.cut(str[7].trim(),10);
-        EventLogger.log(Level.INFO, "decoded Event at time: " + time);
-            } catch (Exception e) {
+            //str has format "key1=value1,key2=value2,key3=value3,"
+            for (String kvPair : str){
+                decodeValue(kvPair);
             }
+        }
+        
+        private void decodeValue(String str){
+            if (str==null || str.equals("")) return;
+            
+            String[] kv = str.split("=");
+            if(kv.length<2) return;
+            
+            this.put(kv[0], kv[1]);
         }
     }
 

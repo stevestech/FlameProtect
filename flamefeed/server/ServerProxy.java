@@ -39,6 +39,7 @@ public class ServerProxy {
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new ProtectCommand());
         event.registerServerCommand(new LogCommand());
+        event.registerServerCommand(new WhatCommand());
     }
 
 }

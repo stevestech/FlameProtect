@@ -18,7 +18,7 @@ import flamefeed.server.ServerProxy;
  *
  * @author Anedaar
  */
-@Mod(modid = "FlameProtect", name = "Flamefeed World Protection", version = "0.1")
+@Mod(modid = "FlameProtect", name = "Flamefeed World Protection", version = "0.2")
 @NetworkMod(channels = {"FlameProtect"}, clientSideRequired = false, serverSideRequired = false, packetHandler = PacketHandler.class)
 
 public class FlameProtect {

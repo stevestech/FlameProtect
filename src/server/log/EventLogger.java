@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flamefeed.server.log;
+package flamefeed.FlameProtect.src.server.log;
 
-import flamefeed.server.Server;
+import flamefeed.FlameProtect.src.server.Server;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import cpw.mods.fml.common.FMLLog;

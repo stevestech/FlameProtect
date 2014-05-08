@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flamefeed.client;
+package flamefeed.FlameProtect.src.client;
 
 import cpw.mods.fml.common.network.PacketDispatcher;
-import flamefeed.client.SQLResult.SQLResultRow;
+import flamefeed.FlameProtect.src.client.SQLResult.SQLResultRow;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

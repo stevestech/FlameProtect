@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flamefeed.server.log;
+package flamefeed.FlameProtect.src.server.log;
 
 import java.util.Date;
 import net.minecraft.entity.player.EntityPlayer;

@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flamefeed.client;
+package flamefeed.FlameProtect.src.client;
 
-import flamefeed.PacketHandler;
-import flamefeed.server.log.SQLHandler;
-import flamefeed.server.log.EventLogger;
+import flamefeed.FlameProtect.src.PacketHandler;
+import flamefeed.FlameProtect.src.server.log.SQLHandler;
+import flamefeed.FlameProtect.src.server.log.EventLogger;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package flamefeed.server;
+package flamefeed.FlameProtect.src.server;
 
 /**
  *

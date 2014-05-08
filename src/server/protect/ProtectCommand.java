@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flamefeed.server.protect;
+package flamefeed.FlameProtect.src.server.protect;
 
-import flamefeed.server.Server;
+import flamefeed.FlameProtect.src.server.Server;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.command.ICommand;

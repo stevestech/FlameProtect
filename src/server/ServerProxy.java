@@ -3,17 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flamefeed.server;
+package flamefeed.FlameProtect.src.server;
 
-import flamefeed.server.log.LogCommand;
-import flamefeed.server.log.LogEventHandler;
+import flamefeed.FlameProtect.src.server.log.LogCommand;
+import flamefeed.FlameProtect.src.server.log.LogEventHandler;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import flamefeed.server.ServerConfigHandler;
-import flamefeed.server.log.EventLogger;
-import flamefeed.server.protect.ProtectCommand;
-import flamefeed.server.protect.ProtectEventHandler;
+import flamefeed.FlameProtect.src.server.ServerConfigHandler;
+import flamefeed.FlameProtect.src.server.log.EventLogger;
+import flamefeed.FlameProtect.src.server.protect.ProtectCommand;
+import flamefeed.FlameProtect.src.server.protect.ProtectEventHandler;
 import java.util.logging.Level;
 import net.minecraftforge.common.MinecraftForge;
 

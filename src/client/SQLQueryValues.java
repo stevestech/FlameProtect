@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flamefeed.client;
+package flamefeed.FlameProtect.src.client;
 
 import java.sql.Timestamp;
 import java.util.Calendar;

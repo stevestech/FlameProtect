@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flamefeed.client;
+package flamefeed.FlameProtect.src.client;
 
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import flamefeed.server.ServerProxy;
+import flamefeed.FlameProtect.src.server.ServerProxy;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 

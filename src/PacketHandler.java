@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flamefeed;
+package flamefeed.FlameProtect.src;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.relauncher.Side;
-import flamefeed.client.SQLResult;
-import flamefeed.server.log.SQLHandler;
+import flamefeed.FlameProtect.src.client.SQLResult;
+import flamefeed.FlameProtect.src.server.log.SQLHandler;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
 

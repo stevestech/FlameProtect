@@ -23,7 +23,7 @@ import flamefeed.FlameProtect.src.server.ServerProxy;
 
 public class FlameProtect {
 
-    @SidedProxy(serverSide = "flamefeed.server.ServerProxy", clientSide = "flamefeed.client.ClientProxy")
+    @SidedProxy(serverSide = "flamefeed.FlameProtect.src.server.ServerProxy", clientSide = "flamefeed.FlameProtect.src.client.ClientProxy")
     public static ServerProxy proxy;
 
     @EventHandler

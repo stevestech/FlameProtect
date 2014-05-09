@@ -1,7 +1,10 @@
+REM dir: \forge\mcp\src\minecraft\flamefeed\FlameLoader\jar
 
-cd "E:\Informatik\NetBeans\forge\mcp\"
+cd ..\..\..\..\..
+REM dir: \forge\mcp\
 call recompile.bat < nul
 call reobfuscate.bat < nul
 
-cd E:\Informatik\NetBeans\forge\mcp\reobf\minecraft
+cd reobf\minecraft
+REM dir: \forge\mcp\reobf\minecraft
 jar cvf %~dp0\FlameProtect.jar flamefeed\FlameProtect\src

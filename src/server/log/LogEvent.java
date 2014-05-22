@@ -82,6 +82,8 @@ public class LogEvent {
             return new ItemStack(targetID, 1, targetDamage).getDisplayName();
         } catch (NullPointerException e) {
             return "NPE";
+        } catch (Exception e){
+            return "-E-";
         }
     }
     
@@ -98,6 +100,8 @@ public class LogEvent {
             return new ItemStack(toolID, 1, toolDamage).getDisplayName();
         } catch (NullPointerException e) {
             return "NPE";
+        } catch (Exception e){
+            return "-E-";
         }
     }
     

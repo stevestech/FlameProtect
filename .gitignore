@@ -1,0 +1,12 @@
+/bin/
+/eclipse/
+/gradle/
+.classpath
+.project
+CREDITS-fml.txt
+LICENSE-fml.txt
+MinecraftForge-Credits.txt
+MinecraftForge-License.txt
+forge-1.6.4-9.11.1.964-changelog.txt
+gradlew
+gradlew.bat

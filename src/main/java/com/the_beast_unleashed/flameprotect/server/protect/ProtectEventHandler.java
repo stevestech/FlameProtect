@@ -13,6 +13,8 @@ import cpw.mods.fml.common.FMLLog;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,12 +34,14 @@ public class ProtectEventHandler {
     private static final String PICKUP = "pickup";
     private static final String INTERACT = "interact";
     
-    private static Date lastChatWarningDate;
+    private Map<String, Map<String, Date>> chatWarningCooldown;
+    // Map<String username, Map<String blockedAction, Date lastChatWarning>>    
 
     public IPermissionManager permManager;
+    
 
     public ProtectEventHandler() {
-    	lastChatWarningDate = new Date(0);    	
+    	chatWarningCooldown = new HashMap<String, Map<String, Date>>();
     	
         try {
             Class<?> forgePerms = Class.forName("com.sperion.forgeperms.ForgePerms");
@@ -96,15 +100,33 @@ public class ProtectEventHandler {
     }
     
     
-    private boolean readyForNextWarning() {
-    	// Have more than 10 seconds passed since the last chat warning?
+    private boolean readyForNextWarning(EntityPlayer entityPlayer, String blockedAction) {
+    	// Have more than 10 seconds passed since the last chat warning for the given player and action?
     	
+    	String username = entityPlayer.username.toLowerCase().trim();
     	Calendar currentTime = Calendar.getInstance();
-    	Calendar lastChatWarningCalendar = Calendar.getInstance();
-        currentTime.setTime(new Date());
-        lastChatWarningCalendar.setTime(lastChatWarningDate);
-        lastChatWarningCalendar.add(Calendar.SECOND, 10);
-        return currentTime.after(lastChatWarningCalendar);
+    	Calendar lastChatWarning = Calendar.getInstance();
+    	
+    	// Perform any necessary initialisations
+    	if (!chatWarningCooldown.containsKey(username)) {
+    		chatWarningCooldown.put(username, new HashMap<String, Date>());
+    	}
+    	
+    	if (!chatWarningCooldown.get(username).containsKey(blockedAction)) {
+    		chatWarningCooldown.get(username).put(blockedAction, new Date(0));
+    	}
+    		
+		currentTime.setTime(new Date());
+		lastChatWarning.setTime(chatWarningCooldown.get(username).get(blockedAction));
+		lastChatWarning.add(Calendar.SECOND, 10);
+		
+		if (currentTime.after(lastChatWarning)) {   			
+			chatWarningCooldown.get(username).put(blockedAction, new Date());
+			return true;    				
+		} else {
+			return false;
+		}	
+		
     }
     
 
@@ -113,9 +135,9 @@ public class ProtectEventHandler {
 
     	if (!hasPermission(event.entityPlayer, PICKUP)) {
             event.setCanceled(true);           
-            if (readyForNextWarning()) {
+            
+            if (readyForNextWarning(event.entityPlayer, PICKUP)) {
                 event.entityPlayer.addChatMessage(Server.noPickup);
-            	lastChatWarningDate = new Date();
             }
             
         }
@@ -128,9 +150,9 @@ public class ProtectEventHandler {
  	
         if (!hasPermission(event.entityPlayer, INTERACT)) {        	        	
             event.setCanceled(true);
-            if (readyForNextWarning()) {
+            
+            if (readyForNextWarning(event.entityPlayer, INTERACT)) {
             	event.entityPlayer.addChatMessage(Server.noInteract);
-            	lastChatWarningDate = new Date();
             }
             
         }

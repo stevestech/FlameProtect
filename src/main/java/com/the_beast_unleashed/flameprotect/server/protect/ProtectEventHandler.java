@@ -100,8 +100,8 @@ public class ProtectEventHandler {
     }
     
     
-    private boolean readyForNextWarning(EntityPlayer entityPlayer, String blockedAction) {
-    	// Have more than 10 seconds passed since the last chat warning for the given player and action?
+    private boolean readyForNextWarning(EntityPlayer entityPlayer, String blockedAction, int cooldownSeconds) {
+    	// Has the cooldown had time to complete since the last chat warning for the given player and action?
     	
     	String username = entityPlayer.username.toLowerCase().trim();
     	Calendar currentTime = Calendar.getInstance();
@@ -118,7 +118,7 @@ public class ProtectEventHandler {
     		
 		currentTime.setTime(new Date());
 		lastChatWarning.setTime(chatWarningCooldown.get(username).get(blockedAction));
-		lastChatWarning.add(Calendar.SECOND, 10);
+		lastChatWarning.add(Calendar.SECOND, cooldownSeconds);
 		
 		if (currentTime.after(lastChatWarning)) {   			
 			chatWarningCooldown.get(username).put(blockedAction, new Date());
@@ -136,7 +136,7 @@ public class ProtectEventHandler {
     	if (!hasPermission(event.entityPlayer, PICKUP)) {
             event.setCanceled(true);           
             
-            if (readyForNextWarning(event.entityPlayer, PICKUP)) {
+            if (readyForNextWarning(event.entityPlayer, PICKUP, 10)) {
                 event.entityPlayer.addChatMessage(Server.noPickup);
             }
             
@@ -151,7 +151,7 @@ public class ProtectEventHandler {
         if (!hasPermission(event.entityPlayer, INTERACT)) {        	        	
             event.setCanceled(true);
             
-            if (readyForNextWarning(event.entityPlayer, INTERACT)) {
+            if (readyForNextWarning(event.entityPlayer, INTERACT, 10)) {
             	event.entityPlayer.addChatMessage(Server.noInteract);
             }
             

@@ -5,6 +5,7 @@
  */
 package com.the_beast_unleashed.flameprotect.client;
 
+import com.the_beast_unleashed.flameprotect.FlameProtectLogger;
 import com.the_beast_unleashed.flameprotect.PacketHandler;
 import com.the_beast_unleashed.flameprotect.server.log.EventLogger;
 import com.the_beast_unleashed.flameprotect.server.log.SQLHandler;
@@ -54,9 +55,7 @@ public class SQLResult {
                 rows.add(new SQLResultRow(rawData1.split(",")));
             }
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(PacketHandler.class.getName()).log(Level.SEVERE, null, ex);
-//        
-
+            FlameProtectLogger.getLogger().log(Level.SEVERE, null, ex);        
         }
 
     }

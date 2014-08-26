@@ -5,10 +5,14 @@
  */
 package com.the_beast_unleashed.flameprotect.server.log;
 
-import com.the_beast_unleashed.flameprotect.server.Server;
+import com.the_beast_unleashed.flameprotect.FlameProtectLogger;
+import com.the_beast_unleashed.flameprotect.server.PermissionManager;
+import com.the_beast_unleashed.flameprotect.server.PermissionManagerException;
+import com.the_beast_unleashed.flameprotect.server.ServerConfigHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -25,18 +29,18 @@ public class LogCommand implements ICommand {
 
     @Override
     public String getCommandName() {
-        return Server.logCmd;
+        return ServerConfigHandler.Lang.logCmd;
     }
 
     @Override
     public String getCommandUsage(ICommandSender icommandsender) {
-        return "/" + Server.logCmd + " help";
+        return "/" +  ServerConfigHandler.Lang.logCmd + " help";
     }
 
     @Override
     public List getCommandAliases() {
         ArrayList list = new ArrayList();
-        list.add(Server.logCmd);
+        list.add( ServerConfigHandler.Lang.logCmd);
 
         return list;
     }
@@ -46,27 +50,31 @@ public class LogCommand implements ICommand {
         if (astring.length == 0) {
             //general help
             icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Logging commands:\n"
-                    + "/" + Server.logCmd + " sql [true/false]\n"
-                    + "/" + Server.logCmd + " subscribe <n>"));
+                    + "/" + ServerConfigHandler.Lang.logCmd + " sql [true/false]\n"
+                    + "/" + ServerConfigHandler.Lang.logCmd + " subscribe <n>"));
         } else if ("sql".compareTo(astring[0]) == 0) {
             //sql command
             if (astring.length < 2
                     || ("true".compareTo(astring[1]) != 0 && "false".compareTo(astring[1]) != 0)) {
-                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("SQL-Logging: " + Server.SQL.enabled + "\n"
-                        + "/" + Server.logCmd + " sql [true/false]"));
+            	
+                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText(
+                		"SQL-Logging: " + ServerConfigHandler.EnabledModules.loggingSQL + "\n"
+                        + "/" + ServerConfigHandler.Lang.logCmd + " sql [true/false]"));
             } else {
-                Server.SQL.enabled = Boolean.parseBoolean(astring[1]);
-                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("SQL-Logging: " + Server.SQL.enabled + ""));
+            	ServerConfigHandler.EnabledModules.loggingSQL = Boolean.parseBoolean(astring[1]);
+                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("SQL-Logging: " + ServerConfigHandler.EnabledModules.loggingSQL));
             }
         } else if ("console".compareTo(astring[0]) == 0) {
             //console log command
             if (astring.length < 2
                     || ("true".compareTo(astring[1]) != 0 && "false".compareTo(astring[1]) != 0)) {
-                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Console-Logging: " + Server.Log.console + "\n"
-                        + "/" + Server.logCmd + " console [true/false]"));
+            	
+                icommandsender.sendChatToPlayer(
+                		ChatMessageComponent.createFromText("Console-Logging: " + ServerConfigHandler.EnabledModules.loggingConsole + "\n"
+                        + "/" + ServerConfigHandler.Lang.logCmd + " console [true/false]"));
             } else {
-                Server.Log.console = Boolean.parseBoolean(astring[1]);
-                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Console-Logging: " + Server.Log.console + ""));
+            	ServerConfigHandler.EnabledModules.loggingConsole = Boolean.parseBoolean(astring[1]);
+                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Console-Logging: " + ServerConfigHandler.EnabledModules.loggingConsole));
             }
         } else if ("subscribe".compareTo(astring[0]) == 0) {
             //subscribe command
@@ -75,10 +83,12 @@ public class LogCommand implements ICommand {
                     Byte n = Byte.parseByte(astring[1]);
                     EventLogger.subscribe(icommandsender, n);
                     return;
-                } catch (NumberFormatException numberFormatException) {
+                } catch (NumberFormatException ex) {
+                	FlameProtectLogger.getLogger().log(Level.WARNING, null, ex);
                 }
             }
-            icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("/" + Server.logCmd + " subscribe <n>"));
+            
+            icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("/" + ServerConfigHandler.Lang.logCmd + " subscribe <n>"));
 
         }
 
@@ -86,19 +96,20 @@ public class LogCommand implements ICommand {
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
-        if (MinecraftServer.getServer().isSinglePlayer())
-        	return true;
         if (icommandsender instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) icommandsender;
-            return MinecraftServer.getServerConfigurationManager(MinecraftServer.getServer()).getOps().contains(player.username.toLowerCase().trim());
-        } else {
-            return !(icommandsender instanceof TileEntityCommandBlock);
+        	try {
+        		return PermissionManager.hasPermission((EntityPlayer) icommandsender, ServerConfigHandler.Perms.ADMIN);
+        	} catch (PermissionManagerException ex) {
+        		icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText(ServerConfigHandler.Lang.noPermissionManager));
+        	}
         }
+        	
+        return false;
     }
 
     @Override
     public List addTabCompletionOptions(ICommandSender icommandsender, String[] astring) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override

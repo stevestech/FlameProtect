@@ -5,7 +5,8 @@
  */
 package com.the_beast_unleashed.flameprotect.server.log;
 
-import com.the_beast_unleashed.flameprotect.server.Server;
+import com.the_beast_unleashed.flameprotect.FlameProtectLogger;
+import com.the_beast_unleashed.flameprotect.server.ServerConfigHandler;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,14 +22,12 @@ import net.minecraft.command.ICommandSender;
  * @author Anedaar
  */
 public class EventLogger {
-
-    private static final Logger logger = Logger.getLogger("FlameProtect");
+    private static final Logger logger = FlameProtectLogger.getLogger();
 
     private static final HashMap<ICommandSender, Byte> subscribers = new HashMap();
 
     public static void init() {
-        logger.setParent(FMLLog.getLogger());
-        if (Server.SQL.enabled) {
+        if (ServerConfigHandler.EnabledModules.loggingSQL) {
             SQLHandler.init();
         }
     }
@@ -38,9 +37,10 @@ public class EventLogger {
         logger.log(logLevel, message);
     }
 
+    
     public static void log(LogEvent e, byte output) {
 
-        if ((output & 1) != 0 && Server.Log.console) {
+        if ((output & 1) != 0 && ServerConfigHandler.EnabledModules.loggingConsole) {
             logger.log(Level.INFO, 
                 "Logged Event: [{0},{1},{2},{3}] {4}: {5} {6}x{7} ({8}) with {9}x{10} ({11})",
                     new Object[]{e.world, e.x, e.y, e.z, e.source, e.action,
@@ -48,7 +48,7 @@ public class EventLogger {
                         e.toolN, e.getToolID(), e.getToolName()});
         }
 
-        if ((output & 2) != 0 && Server.SQL.enabled) {
+        if ((output & 2) != 0 && ServerConfigHandler.EnabledModules.loggingSQL) {
             SQLHandler.log(e);
         }
 //        

@@ -8,7 +8,8 @@ package com.the_beast_unleashed.flameprotect.server.log;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 
-import com.the_beast_unleashed.flameprotect.server.Server;
+import com.the_beast_unleashed.flameprotect.FlameProtectLogger;
+import com.the_beast_unleashed.flameprotect.server.ServerConfigHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -82,7 +83,7 @@ public class SQLHandler {
                             eventQueue.wait();
                         }
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(SQLHandler.class.getName()).log(Level.SEVERE, null, ex);
+                        FlameProtectLogger.getLogger().log(Level.SEVERE, null, ex);
                         this.interrupt();
                     }
                 } //else: unknown object, discard and go on (should be impossible)
@@ -262,15 +263,15 @@ public class SQLHandler {
         try {
             //establish connection
             Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://" + Server.SQL.host + "/" + Server.SQL.database,
-                    Server.SQL.user, Server.SQL.pw);
+                    "jdbc:mysql://" + ServerConfigHandler.SQL.host + "/" + ServerConfigHandler.SQL.database,
+                    ServerConfigHandler.SQL.user, ServerConfigHandler.SQL.pw);
             sql = con.createStatement();
 
             //check if table exists
             ////metaInfo
             ResultSet schemaRS = sql.executeQuery(
                     "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '"
-                    + Server.SQL.database + "'  AND table_name = 'metaInfo';");
+                    + ServerConfigHandler.SQL.database + "'  AND table_name = 'metaInfo';");
             schemaRS.next();
             boolean metaExists = (schemaRS.getInt(1) == 1);
             schemaRS.close();
@@ -278,7 +279,7 @@ public class SQLHandler {
             ////LogEntries
             schemaRS = sql.executeQuery(
                     "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '"
-                    + Server.SQL.database + "'  AND table_name = 'logEntries';");
+                    + ServerConfigHandler.SQL.database + "'  AND table_name = 'logEntries';");
             schemaRS.next();
             boolean logExists = (schemaRS.getInt(1) == 1);
             schemaRS.close();
@@ -396,7 +397,7 @@ public class SQLHandler {
         } catch (SQLException ex) {
             EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
             EventLogger.log(Level.SEVERE, "SQL logging has been disabled");
-            Server.SQL.enabled = false;
+            ServerConfigHandler.EnabledModules.loggingSQL = false;
         }
     }
 
@@ -410,7 +411,7 @@ public class SQLHandler {
         try {
             sql.close();
         } catch (SQLException ex) {
-            Logger.getLogger(SQLHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SQLHandler.class.getName()).log(Level.WARNING, null, ex);
         }
     }
 
@@ -455,7 +456,7 @@ public class SQLHandler {
      * @param player the player who gets the resultSet as a packet
      */
     public static void addQuery(Packet250CustomPayload packet, Player player) {
-        if (thread == null || !Server.SQL.enabled) {
+        if (thread == null || !ServerConfigHandler.EnabledModules.loggingSQL) {
             return;
         }
 
@@ -469,7 +470,7 @@ public class SQLHandler {
      * @param event the event to log
      */
     public static void log(LogEvent event) {
-        if (thread == null || !Server.SQL.enabled) {
+        if (thread == null || !ServerConfigHandler.EnabledModules.loggingSQL) {
             return;
         }
 

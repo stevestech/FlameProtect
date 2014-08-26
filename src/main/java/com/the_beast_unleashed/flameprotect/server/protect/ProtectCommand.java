@@ -5,7 +5,9 @@
  */
 package com.the_beast_unleashed.flameprotect.server.protect;
 
-import com.the_beast_unleashed.flameprotect.server.Server;
+import com.the_beast_unleashed.flameprotect.server.PermissionManager;
+import com.the_beast_unleashed.flameprotect.server.PermissionManagerException;
+import com.the_beast_unleashed.flameprotect.server.ServerConfigHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,38 +31,42 @@ public class ProtectCommand implements ICommand {
 
     @Override
     public String getCommandName() {
-        return Server.protCmd;
+        return ServerConfigHandler.Lang.protCmd;
     }
 
     @Override
     public String getCommandUsage(ICommandSender icommandsender) {
-        return "/"+Server.protCmd;
+        return "/" + ServerConfigHandler.Lang.protCmd;
     }
 
     @Override
     public List getCommandAliases() {
         ArrayList list = new ArrayList();
-        list.add(Server.protCmd);
+        list.add(ServerConfigHandler.Lang.protCmd);
 
         return list;
     }
 
     @Override
     public void processCommand(ICommandSender icommandsender, String[] astring) {
-        Server.enabled = !Server.enabled;
-        icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Protection: " + Boolean.toString(Server.enabled)));
+        ServerConfigHandler.EnabledModules.protection = !ServerConfigHandler.EnabledModules.protection;
+        
+        icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText(
+        		"Protection: " + Boolean.toString(ServerConfigHandler.EnabledModules.protection))
+        );
     }
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
-        if (MinecraftServer.getServer().isSinglePlayer())
-        	return true;
         if (icommandsender instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) icommandsender;
-            return MinecraftServer.getServerConfigurationManager(MinecraftServer.getServer()).getOps().contains(player.username.toLowerCase().trim());
-        } else {
-            return !(icommandsender instanceof TileEntityCommandBlock);
+        	try {
+        		return PermissionManager.hasPermission((EntityPlayer) icommandsender, ServerConfigHandler.Perms.ADMIN);
+        	} catch (PermissionManagerException ex) {
+        		icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText(ServerConfigHandler.Lang.noPermissionManager));
+        	}
         }
+        	
+        return false;
     }
 
     @Override

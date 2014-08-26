@@ -47,12 +47,11 @@ public class PacketHandler implements IPacketHandler {
 
     private void handlePacketOnClient(Packet250CustomPayload packet, Player player) {
 //        try {
-//            EventLogger.log(Level.INFO, "client packet accepted: "+player.toString()+":" + new String(packet.data, "UTF-8"));
+//            FlameProtectLogger.getLogger().log(Level.INFO, "client packet accepted: "+player.toString()+":" + new String(packet.data, "UTF-8"));
 //        } catch (UnsupportedEncodingException ex) {
-//            Logger.getLogger(PacketHandler.class.getName()).log(Level.SEVERE, null, ex);
+//            FlameProtectLogger.getLogger().log(Level.SEVERE, null, ex);
 //        }
                
-            SQLResult.parseResult(packet.data);
-//        
+          SQLResult.parseResult(packet.data);
     }
 }

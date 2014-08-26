@@ -21,18 +21,18 @@ public class WhatCommand implements ICommand {
 
     @Override
     public String getCommandName() {
-        return Server.whatCmd;
+        return ServerConfigHandler.Lang.whatCmd;
     }
 
     @Override
     public String getCommandUsage(ICommandSender icommandsender) {
-        return "/" + Server.whatCmd;
+        return "/" + ServerConfigHandler.Lang.whatCmd;
     }
 
     @Override
     public List getCommandAliases() {
         ArrayList list = new ArrayList();
-        list.add(Server.whatCmd);
+        list.add(ServerConfigHandler.Lang.whatCmd);
 
         return list;
     }

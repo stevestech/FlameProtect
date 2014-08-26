@@ -2,4 +2,7 @@ FlameProtect Changelog:
 
 Build 1.6.4-0.3:
 - Prevent players on server being able to use /prot and /log without being opped.
-- Add a cooldown to warning messages sent to players who are denied access.
+- Add a cool-down to warning messages sent to players who are denied access.
+- Re-implement permissions, allow per-world permissions.
+- Add player attack and player invulnerablity checks.
+- Add tick handler to keep players with the appropriate permission fed.

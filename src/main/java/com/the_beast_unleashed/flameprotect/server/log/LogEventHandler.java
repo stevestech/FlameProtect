@@ -5,10 +5,10 @@
  */
 package com.the_beast_unleashed.flameprotect.server.log;
 
-import com.the_beast_unleashed.flameprotect.server.Server;
-
 import java.util.HashMap;
 import java.util.logging.Level;
+
+import com.the_beast_unleashed.flameprotect.server.ServerConfigHandler;
 
 import net.minecraft.block.Block;
 import net.minecraftforge.event.Event;
@@ -30,12 +30,11 @@ public class LogEventHandler {
 
     @ForgeSubscribe(priority = LOWEST)
     public void onBlockBreak(BreakEvent event) {
-        if (event.world.isRemote || (!Server.Log.console && !Server.SQL.enabled)) {
-            return;
-        }
-
+        if (!ServerConfigHandler.EnabledModules.loggingSQL
+        		&& !ServerConfigHandler.EnabledModules.loggingConsole)
+        	return;
+        
         LogEvent log = new LogEvent();
-
         log.setPosition(event.x, event.y, event.z);
 
         if (event.getPlayer() != null) {
@@ -45,22 +44,23 @@ public class LogEventHandler {
             log.setSource(event.getPlayer());
         }
 
-        if (event.block!=null)
+        if (event.block != null)
             log.targetID = event.block.blockID;
+        
         log.targetDamage = event.blockMetadata;
         log.targetN = 1;
 
         log.action = "break";
 
-        EventLogger.log(log, Server.Log.blockBreak);
+        EventLogger.log(log, ServerConfigHandler.Log.blockBreak);
 
     }
 
     @ForgeSubscribe(priority = LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.entityPlayer.worldObj.isRemote || (!Server.Log.console && !Server.SQL.enabled)) {
-            return;
-        }
+        if (!ServerConfigHandler.EnabledModules.loggingSQL
+        		&& !ServerConfigHandler.EnabledModules.loggingConsole)
+        	return;
 
         LogEvent log = new LogEvent();
 
@@ -75,7 +75,7 @@ public class LogEventHandler {
 
             log.setPosition(event.entityPlayer);
 
-            EventLogger.log(log, Server.Log.rightAir);
+            EventLogger.log(log, ServerConfigHandler.Log.rightAir);
 
         } else if (event.action == Action.RIGHT_CLICK_BLOCK) { //Use Item on Block
 
@@ -87,13 +87,14 @@ public class LogEventHandler {
                 EventLogger.log(Level.SEVERE, e.getStackTrace().toString());
             }
 
-            if (false) { //Try to determine if it gets placed/used/accessed
-                log.action = "place";
-            } else {
-                log.action = "use";
-            }
+//            if (false) { //Try to determine if it gets placed/used/accessed
+//                log.action = "place";
+//            } else {
+//                log.action = "use";
+//            }
+            log.action = "use";
 
-            EventLogger.log(log, Server.Log.rightBlock);
+            EventLogger.log(log, ServerConfigHandler.Log.rightBlock);
 
         } else if (event.action == Action.LEFT_CLICK_BLOCK) { //Hit Block
 
@@ -117,16 +118,16 @@ public class LogEventHandler {
 
             log.action = "hit";
 
-            EventLogger.log(log, Server.Log.leftBlock);
+            EventLogger.log(log, ServerConfigHandler.Log.leftBlock);
         }
 
     }
 
     @ForgeSubscribe(priority = HIGHEST)
     public void onEntityItemPickup(EntityItemPickupEvent event) {
-        if (event.entityPlayer.worldObj.isRemote || (!Server.Log.console && !Server.SQL.enabled)) {
-            return;
-        }
+        if (!ServerConfigHandler.EnabledModules.loggingSQL
+        		&& !ServerConfigHandler.EnabledModules.loggingConsole)
+        	return;
 
         LogEvent log = new LogEvent();
 
@@ -150,7 +151,7 @@ public class LogEventHandler {
         LogEvent log = eventMap.get(event);
 
         if (log != null && !event.isCanceled()) {
-            EventLogger.log(log, Server.Log.pickup);
+            EventLogger.log(log, ServerConfigHandler.Log.pickup);
         }
         
         eventMap.remove(event);

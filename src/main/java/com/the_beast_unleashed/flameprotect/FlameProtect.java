@@ -19,7 +19,7 @@ import com.the_beast_unleashed.flameprotect.server.ServerProxy;
  *
  * @author Anedaar
  */
-@Mod(modid = "FlameProtect", name = "Flamefeed World Protection", version = "0.3")
+@Mod(modid = "FlameProtect", name = "World protection and player logging utility", version = "0.3")
 @NetworkMod(channels = {"FlameProtect"}, clientSideRequired = false, serverSideRequired = false, packetHandler = PacketHandler.class)
 
 public class FlameProtect {

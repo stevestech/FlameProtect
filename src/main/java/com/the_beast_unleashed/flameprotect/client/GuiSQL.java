@@ -7,6 +7,7 @@ package com.the_beast_unleashed.flameprotect.client;
 
 import cpw.mods.fml.common.network.PacketDispatcher;
 
+import com.the_beast_unleashed.flameprotect.FlameProtectLogger;
 import com.the_beast_unleashed.flameprotect.client.SQLResult.SQLResultRow;
 
 import java.io.ByteArrayOutputStream;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiButton;
@@ -231,7 +231,7 @@ class GuiSQL extends GuiScreen {
                 outputStream.writeUTF(";");
             }
         } catch (IOException ex) {
-            Logger.getLogger(GuiSQL.class.getName()).log(Level.SEVERE, null, ex);
+            FlameProtectLogger.getLogger().log(Level.SEVERE, null, ex);
         }
 
         Packet250CustomPayload packet = new Packet250CustomPayload();

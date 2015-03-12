@@ -6,6 +6,8 @@
 package com.the_beast_unleashed.flameprotect.server.log;
 
 import java.util.Date;
+import java.util.UUID;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
@@ -21,11 +23,12 @@ public class LogEvent {
     public String world = "NYI";
     public Date time = new Date();
     public String source = "NYI";
-    public int targetID = 0;
+    public UUID sourceUUID;
+    public String targetName = "none";
     public int targetDamage = 0;
     public int targetN = 0;
     public String action = "NYI";
-    public int toolID = 0;
+    public String toolName = "Hands";
     public int toolDamage = 0;
     public int toolN = 0;
     public boolean isSneaking = false;
@@ -40,11 +43,12 @@ public class LogEvent {
      * @param player
      */
     public void setSource(EntityPlayer player){
-         this.source = player.getEntityName();
+        this.source = player.getDisplayName();
+        this.sourceUUID = player.getUniqueID();
 
         ItemStack toolStack = player.getCurrentEquippedItem();
         if (toolStack != null) {
-            this.toolID = toolStack.itemID;
+        	this.toolName = toolStack.getDisplayName();
             this.toolDamage = toolStack.getItemDamage();
             this.toolN = toolStack.stackSize;
         }
@@ -74,42 +78,6 @@ public class LogEvent {
          this.x = (int)player.posX;
          this.y = (int)player.posY;
          this.z = (int)player.posZ;
-    }
-
-    public String getTargetName() {
-        if (targetID==0) return "Air";
-        try {
-            return new ItemStack(targetID, 1, targetDamage).getDisplayName();
-        } catch (NullPointerException e) {
-            return "NPE";
-        } catch (Exception e){
-            return "-E-";
-        }
-    }
-    
-    public String getTargetID(){
-        if (targetDamage!=0){
-            return targetID+":"+targetDamage;
-        }
-        return targetID+"";
-    }
-
-    public String getToolName() {
-        if (toolID==0) return "Hands";
-        try {
-            return new ItemStack(toolID, 1, toolDamage).getDisplayName();
-        } catch (NullPointerException e) {
-            return "NPE";
-        } catch (Exception e){
-            return "-E-";
-        }
-    }
-    
-    public String getToolID(){
-        if (toolDamage!=0){
-            return toolID+":"+toolDamage;
-        }
-        return toolID+"";
     }
 
 }

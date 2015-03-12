@@ -10,11 +10,10 @@ import java.util.logging.Level;
 
 import com.the_beast_unleashed.flameprotect.server.ServerConfigHandler;
 
+import cpw.mods.fml.common.eventhandler.Event;
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.Block;
-import net.minecraftforge.event.Event;
-import static net.minecraftforge.event.EventPriority.HIGHEST;
-import static net.minecraftforge.event.EventPriority.LOWEST;
-import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
@@ -28,7 +27,7 @@ public class LogEventHandler {
 
     private HashMap<Event, LogEvent> eventMap = new HashMap();
 
-    @ForgeSubscribe(priority = LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onBlockBreak(BreakEvent event) {
         if (!ServerConfigHandler.EnabledModules.loggingSQL
         		&& !ServerConfigHandler.EnabledModules.loggingConsole)
@@ -45,7 +44,7 @@ public class LogEventHandler {
         }
 
         if (event.block != null)
-            log.targetID = event.block.blockID;
+            log.targetName = event.block.getLocalizedName();
         
         log.targetDamage = event.blockMetadata;
         log.targetN = 1;
@@ -56,7 +55,7 @@ public class LogEventHandler {
 
     }
 
-    @ForgeSubscribe(priority = LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (!ServerConfigHandler.EnabledModules.loggingSQL
         		&& !ServerConfigHandler.EnabledModules.loggingConsole)
@@ -80,7 +79,7 @@ public class LogEventHandler {
         } else if (event.action == Action.RIGHT_CLICK_BLOCK) { //Use Item on Block
 
             try {
-                log.targetID = event.entityPlayer.worldObj.getBlockId(event.x, event.y, event.z);
+                log.targetName = event.entityPlayer.worldObj.getBlock(event.x, event.y, event.z).getLocalizedName();
                 log.targetDamage = event.entityPlayer.worldObj.getBlockMetadata(event.x, event.y, event.z);
                 log.targetN = 1;
             } catch (NullPointerException e) {
@@ -102,14 +101,12 @@ public class LogEventHandler {
                 EventLogger.log(Level.SEVERE, "entityPlayer is NULL");
             } else if (event.entityPlayer.worldObj == null) {
                 EventLogger.log(Level.SEVERE, "worldObj is NULL");
-            } else if (event.entityPlayer.worldObj.getBlockId(event.x, event.y, event.z) == 0) {
-                EventLogger.log(Level.SEVERE, "BlockID is 0");
-            } else if (Block.blocksList[event.entityPlayer.worldObj.getBlockId(event.x, event.y, event.z)] == null) {
-                EventLogger.log(Level.SEVERE, "Block is 0, ID is " + event.entityPlayer.worldObj.getBlockId(event.x, event.y, event.z));
+            } else if (event.entityPlayer.worldObj.getBlock(event.x, event.y, event.z) == null) {
+                EventLogger.log(Level.SEVERE, "Block object is NULL");
             }
 
             try {
-                log.targetID = event.entityPlayer.worldObj.getBlockId(event.x, event.y, event.z);
+                log.targetName = event.entityPlayer.worldObj.getBlock(event.x, event.y, event.z).getLocalizedName();
                 log.targetDamage = event.entityPlayer.worldObj.getBlockMetadata(event.x, event.y, event.z);
                 log.targetN = 1;
             } catch (NullPointerException e) {
@@ -123,7 +120,7 @@ public class LogEventHandler {
 
     }
 
-    @ForgeSubscribe(priority = HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onEntityItemPickup(EntityItemPickupEvent event) {
         if (!ServerConfigHandler.EnabledModules.loggingSQL
         		&& !ServerConfigHandler.EnabledModules.loggingConsole)
@@ -137,7 +134,7 @@ public class LogEventHandler {
 
         log.setSource(event.entityPlayer);
 
-        log.targetID = event.item.getEntityItem().itemID;
+        log.targetName = event.item.getEntityItem().getDisplayName();
         log.targetDamage = event.item.getEntityItem().getItemDamage();
         log.targetN = event.item.getEntityItem().stackSize;
 
@@ -146,7 +143,7 @@ public class LogEventHandler {
         eventMap.put(event, log);
     }
 
-    @ForgeSubscribe(priority = LOWEST, receiveCanceled = true)
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public void onEarlyEntityItemPickup(EntityItemPickupEvent event) {
         LogEvent log = eventMap.get(event);
 

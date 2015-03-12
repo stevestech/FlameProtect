@@ -5,9 +5,6 @@
  */
 package com.the_beast_unleashed.flameprotect.server.log;
 
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
-
 import com.the_beast_unleashed.flameprotect.FlameProtectLogger;
 import com.the_beast_unleashed.flameprotect.server.ServerConfigHandler;
 
@@ -25,9 +22,6 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.packet.Packet250CustomPayload;
 
 /**
  *
@@ -47,18 +41,6 @@ public class SQLHandler {
     //Main class is responsible to only instantiate once
     private static class SQLHandlerThread extends Thread {
 
-        //Helper Class to store a Packet and a Player inside the queue
-        private class PlayerQuery {
-
-            public Packet250CustomPayload packet;
-            public Player player;
-
-            public PlayerQuery(Packet250CustomPayload pa, Player pl) {
-                this.packet = pa;
-                this.player = pl;
-            }
-        }
-
         private final ConcurrentLinkedQueue<Object> eventQueue = new ConcurrentLinkedQueue();
 
         @Override
@@ -74,8 +56,6 @@ public class SQLHandler {
                 //pass object to the handling method
                 if (obj instanceof LogEvent) {
                     log((LogEvent) obj);
-                } else if (obj instanceof PlayerQuery) {
-                    handleQuery((PlayerQuery) obj);
                 } else if (obj == null) {
                     //queue empty, wait for new objects
                     try {
@@ -93,13 +73,6 @@ public class SQLHandler {
         public void addEvent(LogEvent event) {
             synchronized (eventQueue) {
                 eventQueue.add(event);
-                eventQueue.notify();
-            }
-        }
-
-        public void addQuery(Packet250CustomPayload packet, Player player) {
-            synchronized (eventQueue) {
-                eventQueue.add(new PlayerQuery(packet, player));
                 eventQueue.notify();
             }
         }
@@ -143,88 +116,6 @@ public class SQLHandler {
             } catch (SQLException ex) {
                 EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
             }
-        }
-
-        //handles queries from players to get an extract of the database
-        private void handleQuery(PlayerQuery pQuery) {
-
-            Packet250CustomPayload packet = pQuery.packet;
-            Player player = pQuery.player;
-
-            String rawData[];
-            HashMap<String, String> data = new HashMap();
-
-            try {
-                rawData = new String(packet.data, "UTF-8").split(";");
-                for (String rawData1 : rawData) {
-                    String splitData[] = rawData1.split(",");
-                    data.put(splitData[0].trim(), splitData[1].trim());
-                }
-            } catch (UnsupportedEncodingException ex) {
-                EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
-            }
-
-            String sqlQuery = "SELECT * FROM logEntries WHERE";
-
-            sqlQuery += " x BETWEEN " + data.get("xMin") + " AND " + data.get("xMax");
-            sqlQuery += " AND y BETWEEN " + data.get("yMin") + " AND " + data.get("yMax");
-            sqlQuery += " AND z BETWEEN " + data.get("zMin") + " AND " + data.get("zMax");
-            sqlQuery += " AND time BETWEEN '" + data.get("dateMin") + "' AND '" + data.get("dateMax") + "'";
-            sqlQuery += " AND world = '" + ((EntityPlayer) player).worldObj.getWorldInfo().getWorldName() + "/" + data.get("dim") + "'";
-
-            sqlQuery += " ORDER BY time DESC;";
-
-            EventLogger.log(Level.INFO, "executing " + sqlQuery);
-
-            ResultSet resultSet = null;
-
-            try {
-                resultSet = sql.executeQuery(sqlQuery);
-            } catch (SQLException ex) {
-                EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
-            }
-
-            if (resultSet == null) {
-                return;
-            }
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(1);
-            DataOutputStream outputStream = new DataOutputStream(bos);
-
-            try {
-                while (resultSet.next()) {
-                    addToStream(outputStream, resultSet, new String[]{"x",
-                        "y",
-                        "z",
-                        "world",
-                        "time",
-                        "source",
-                        "targetID",
-                        "targetN",
-                        "targetName",
-                        "action",
-                        "toolID",
-                        "toolN",
-                        "toolName",
-                        "sneak"});
-                    outputStream.writeUTF(";");
-                }
-                resultSet.close();
-            } catch (IOException ex) {
-                EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
-            } catch (SQLException ex) {
-                EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
-            } catch (NullPointerException ex) {
-                EventLogger.log(Level.SEVERE, ex.getLocalizedMessage());
-            }
-
-            Packet250CustomPayload resultPacket = new Packet250CustomPayload();
-            resultPacket.channel = "FlameProtect";
-            resultPacket.data = bos.toByteArray();
-            resultPacket.length = bos.size();
-
-            PacketDispatcher.sendPacketToPlayer(resultPacket, player);
-
         }
 
         private static void addToStream(DataOutputStream out, ResultSet res, String[] fields) {
@@ -326,13 +217,13 @@ public class SQLHandler {
                 addSQLColumn("world", "VARCHAR(20)");
                 addSQLColumn("time", "DATETIME");
                 addSQLColumn("source", "VARCHAR(20)");
-                addSQLColumn("targetID", "VARCHAR(10) AFTER source");
+                addSQLColumn("targetID", "VARCHAR(40) AFTER source");
                 addSQLColumn("targetN", "SMALLINT AFTER targetID");
-                addSQLColumn("targetName", "VARCHAR(30)");
-                addSQLColumn("action", "VARCHAR(5)");
-                addSQLColumn("toolID", "VARCHAR(10) AFTER action");
+                addSQLColumn("targetName", "VARCHAR(40)");
+                addSQLColumn("action", "VARCHAR(10)");
+                addSQLColumn("toolID", "VARCHAR(40) AFTER action");
                 addSQLColumn("toolN", "SMALLINT AFTER toolID");
-                addSQLColumn("toolName", "VARCHAR(30)");
+                addSQLColumn("toolName", "VARCHAR(40)");
                 addSQLColumn("sneak", "BIT");
 
             } else {
@@ -340,6 +231,7 @@ public class SQLHandler {
                 switch (version) {
                     case 0:
                     //whoops, that shouldnt happen. Sit an hope...
+                    	break;
 
                     case 1:
                         //logEntries exists, but no metaInfo
@@ -361,10 +253,11 @@ public class SQLHandler {
                         addSQLColumn("toolN", "SMALLINT AFTER toolID");
                         changeSQLColumn("tool", "toolName", "VARCHAR(30)");
                         addSQLColumn("sneak", "BIT");
+                        
+                        break;
 
                     case 2:
-                    //current version
-                    /* Current table structure:
+                    /* Table structure:
                      x INT
                      y INT
                      z INT
@@ -380,10 +273,38 @@ public class SQLHandler {
                      toolName VARCHAR(30)
                      sneak BIT(1)
                      */
+                    	
+                    	changeSQLColumn("targetID", "targetID", "VARCHAR(40)");
+                    	changeSQLColumn("targetName", "targetName", "VARCHAR(40)");
+                    	changeSQLColumn("action", "action", "VARCHAR(10)");
+                    	changeSQLColumn("toolID", "toolID", "VARCHAR(40)");
+                    	changeSQLColumn("toolName", "toolName", "VARCHAR(40)");
+
+                    	break;
+                    	
+                    	
+                    case 3:
+                    //current version
+                    /* Current table structure:
+                     * x INT
+                     * y INT
+                     * z INT
+                     * world VARCHAR(20)
+                     * time DATETIME
+                     * source VARCHAR(20)
+                     * targetID VARCHAR(40)
+                     * targetN SMALLINT
+                     * targetName VARCHAR(40)
+                     * action VARCHAR(10)
+                     * toolID VARCHAR(40)
+                     * toolN SMALLINT
+                     * toolName VARCHAR(40)
+                     * sneak BIT
+                     */                   	
                 }
             }
 
-            sql.executeUpdate("UPDATE metaInfo SET v = 2 WHERE k = 'version';");
+            sql.executeUpdate("UPDATE metaInfo SET v = 3 WHERE k = 'version';");
 
             sqlAddEntry = con.prepareStatement("INSERT INTO logEntries "
                     + "(x,y,z,world,time,source,targetID,targetN,targetName,action,toolID,toolN,toolName,sneak)"
@@ -446,21 +367,6 @@ public class SQLHandler {
      */
     public static String cut(String s, int n) {
         return s.substring(0, Math.min(n, s.length()));
-    }
-
-    /**
-     * adds a query with its player to the thread-queue SQLHandlerThread is
-     * responsible for the answer
-     *
-     * @param packet must be a packet containing the Query Variables
-     * @param player the player who gets the resultSet as a packet
-     */
-    public static void addQuery(Packet250CustomPayload packet, Player player) {
-        if (thread == null || !ServerConfigHandler.EnabledModules.loggingSQL) {
-            return;
-        }
-
-        thread.addQuery(packet, player);
     }
 
     /**

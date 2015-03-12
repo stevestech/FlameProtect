@@ -93,20 +93,22 @@ public class SQLHandler {
                 sqlAddEntry.setString(++i, sdf.format(e.time));
                 //source
                 sqlAddEntry.setString(++i, cut(e.source, 20));
-                //targetID
-                sqlAddEntry.setString(++i, cut(e.getTargetID(), 10));
+                //sourceUUID
+                sqlAddEntry.setString(++i, cut(e.sourceUUID.toString(), 36));
+                //targetName
+                sqlAddEntry.setString(++i, cut(e.targetName, 40));
+                //targetDamage
+                sqlAddEntry.setInt(++i, e.targetDamage);
                 //targetN
                 sqlAddEntry.setInt(++i, e.targetN);
-                //targetName
-                sqlAddEntry.setString(++i, cut(e.getTargetName(), 30));
                 //action
-                sqlAddEntry.setString(++i, cut(e.action, 5));
-                //toolID
-                sqlAddEntry.setString(++i, cut(e.getToolID(), 10));
+                sqlAddEntry.setString(++i, cut(e.action, 10));
+                //toolName
+                sqlAddEntry.setString(++i, cut(e.toolName, 40));
+                //toolDamage
+                sqlAddEntry.setInt(++i, e.toolDamage);
                 //toolN
                 sqlAddEntry.setInt(++i, e.toolN);
-                //toolName
-                sqlAddEntry.setString(++i, cut(e.getToolName(), 30));
                 //sneak
                 sqlAddEntry.setBoolean(++i, e.isSneaking);
 
@@ -309,8 +311,8 @@ public class SQLHandler {
             sql.executeUpdate("UPDATE metaInfo SET v = 3 WHERE k = 'version';");
 
             sqlAddEntry = con.prepareStatement("INSERT INTO logEntries "
-                    + "(x,y,z,world,time,source,targetID,targetN,targetName,action,toolID,toolN,toolName,sneak)"
-                    + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                    + "(x,y,z,world,time,source,sourceUUID,targetName,targetDamage,targetN,action,toolName,toolDamage,toolN,sneak)"
+                    + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
             thread = new SQLHandlerThread();
             thread.setName("SQLHandlerThread");

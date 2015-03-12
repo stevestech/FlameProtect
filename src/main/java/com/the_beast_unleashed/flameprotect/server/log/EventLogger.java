@@ -42,10 +42,10 @@ public class EventLogger {
 
         if ((output & 1) != 0 && ServerConfigHandler.EnabledModules.loggingConsole) {
             logger.log(Level.INFO, 
-                "Logged Event: [{0},{1},{2},{3}] {4}: {5} {6}x{7} ({8}) with {9}x{10} ({11})",
+                "Logged Event: [{0},{1},{2},{3}] {4}: {5} {6}x{7}:{8} with {9}x{10}:{11}",
                     new Object[]{e.world, e.x, e.y, e.z, e.source, e.action,
-                        e.targetN, e.getTargetID(), e.getTargetName(),
-                        e.toolN, e.getToolID(), e.getToolName()});
+                        e.targetN, e.targetName, e.targetDamage,
+                        e.toolN, e.toolName, e.toolDamage});
         }
 
         if ((output & 2) != 0 && ServerConfigHandler.EnabledModules.loggingSQL) {

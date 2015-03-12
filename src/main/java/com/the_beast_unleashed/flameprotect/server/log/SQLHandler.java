@@ -217,13 +217,14 @@ public class SQLHandler {
                 addSQLColumn("world", "VARCHAR(20)");
                 addSQLColumn("time", "DATETIME");
                 addSQLColumn("source", "VARCHAR(20)");
-                addSQLColumn("targetID", "VARCHAR(40) AFTER source");
-                addSQLColumn("targetN", "SMALLINT AFTER targetID");
-                addSQLColumn("targetName", "VARCHAR(40)");
+                addSQLColumn("sourceUUID", "VARCHAR(36) AFTER source");
+                addSQLColumn("targetName", "VARCHAR(40) AFTER sourceUUID");
+                addSQLColumn("targetDamage", "INT AFTER targetName");
+                addSQLColumn("targetN", "SMALLINT AFTER targetDamage");                
                 addSQLColumn("action", "VARCHAR(10)");
-                addSQLColumn("toolID", "VARCHAR(40) AFTER action");
-                addSQLColumn("toolN", "SMALLINT AFTER toolID");
                 addSQLColumn("toolName", "VARCHAR(40)");
+                addSQLColumn("toolDamage", "INT");
+                addSQLColumn("toolN", "SMALLINT");
                 addSQLColumn("sneak", "BIT");
 
             } else {
@@ -231,7 +232,6 @@ public class SQLHandler {
                 switch (version) {
                     case 0:
                     //whoops, that shouldnt happen. Sit an hope...
-                    	break;
 
                     case 1:
                         //logEntries exists, but no metaInfo
@@ -253,8 +253,6 @@ public class SQLHandler {
                         addSQLColumn("toolN", "SMALLINT AFTER toolID");
                         changeSQLColumn("tool", "toolName", "VARCHAR(30)");
                         addSQLColumn("sneak", "BIT");
-                        
-                        break;
 
                     case 2:
                     /* Table structure:
@@ -274,10 +272,13 @@ public class SQLHandler {
                      sneak BIT(1)
                      */
                     	
+                    	addSQLColumn("sourceUUID", "VARCHAR(36) AFTER source");
                     	changeSQLColumn("targetID", "targetID", "VARCHAR(40)");
+                    	addSQLColumn("targetDamage", "INT AFTER targetID");
                     	changeSQLColumn("targetName", "targetName", "VARCHAR(40)");
                     	changeSQLColumn("action", "action", "VARCHAR(10)");
                     	changeSQLColumn("toolID", "toolID", "VARCHAR(40)");
+                    	addSQLColumn("toolDamage", "INT AFTER toolID");
                     	changeSQLColumn("toolName", "toolName", "VARCHAR(40)");
 
                     	break;
@@ -292,13 +293,14 @@ public class SQLHandler {
                      * world VARCHAR(20)
                      * time DATETIME
                      * source VARCHAR(20)
-                     * targetID VARCHAR(40)
-                     * targetN SMALLINT
+                     * sourceUUID VARCHAR(36)
                      * targetName VARCHAR(40)
+                     * targetDamage INT
+                     * targetN SMALLINT
                      * action VARCHAR(10)
-                     * toolID VARCHAR(40)
-                     * toolN SMALLINT
                      * toolName VARCHAR(40)
+                     * toolDamage INT
+                     * toolN SMALLINT
                      * sneak BIT
                      */                   	
                 }

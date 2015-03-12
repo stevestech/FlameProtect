@@ -5,14 +5,7 @@
  */
 package com.the_beast_unleashed.flameprotect.client;
 
-import cpw.mods.fml.client.registry.KeyBindingRegistry;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-
 import com.the_beast_unleashed.flameprotect.server.ServerProxy;
-
-import net.minecraft.client.settings.KeyBinding;
-
-import org.lwjgl.input.Keyboard;
 
 /**
  *
@@ -20,12 +13,4 @@ import org.lwjgl.input.Keyboard;
  */
 public class ClientProxy extends ServerProxy {
     
-    @Override
-    public void postInit(FMLPostInitializationEvent event) {
-        super.postInit(event);
-        KeyBinding[] key = {new KeyBinding("Show SQL Window", Keyboard.KEY_G)};
-        boolean[] repeat = {false};
-        KeyBindingRegistry.registerKeyBinding(new ClientKeyHandler(key, repeat));
-
-    }
 }

@@ -11,7 +11,6 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.NetworkMod;
 
 import com.the_beast_unleashed.flameprotect.server.ServerProxy;
 
@@ -19,8 +18,7 @@ import com.the_beast_unleashed.flameprotect.server.ServerProxy;
  *
  * @author Anedaar
  */
-@Mod(modid = "FlameProtect", name = "World protection and player logging utility", version = "0.3")
-@NetworkMod(channels = {"FlameProtect"}, clientSideRequired = false, serverSideRequired = false, packetHandler = PacketHandler.class)
+@Mod(modid = "FlameProtect", name = "Player logging utility", version = "0.4.0")
 
 public class FlameProtect {
 	

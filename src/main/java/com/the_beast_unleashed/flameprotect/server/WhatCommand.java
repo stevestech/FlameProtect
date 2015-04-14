@@ -7,11 +7,12 @@ package com.the_beast_unleashed.flameprotect.server;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentText;
 
 /**
  *
@@ -46,17 +47,15 @@ public class WhatCommand implements ICommand {
         ItemStack item = player.getCurrentEquippedItem();
         
         if (item != null) {
-            icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("DisplayName: "+item.getDisplayName()));
-            icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("UnlocalizedName: "+item.getUnlocalizedName()));
-            
-            icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("NewStackDisplayName: "+
+        	
+        	icommandsender.addChatMessage(new ChatComponentText("DisplayName: "+item.getDisplayName()));         
+            icommandsender.addChatMessage(new ChatComponentText("UnlocalizedName: "+item.getUnlocalizedName()));
+            icommandsender.addChatMessage(new ChatComponentText("NewStackDisplayName: "+
                     new ItemStack(item.getItem(),1,item.getItemDamage()).getDisplayName() ));
             
-            icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("ID: "+item.itemID));
-            icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Damage: "+item.getItemDamage()));
-            icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("StackSize: "+item.stackSize));
+            icommandsender.addChatMessage(new ChatComponentText("Damage: "+item.getItemDamage()));
+            icommandsender.addChatMessage(new ChatComponentText("StackSize: "+item.stackSize));
         }
-
 
     }
 

@@ -8,7 +8,7 @@ package com.the_beast_unleashed.flameprotect.server;
 
 import java.io.File;
 
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 
 /**
  *
@@ -55,15 +55,6 @@ public class ServerConfigHandler {
     	public static boolean loggingConsole;
     }
     
-    public static class Perms {
-    	public static Permission INTERACT = new Permission("flameprotect.interact", true);
-    	public static Permission PICKUP = new Permission("flameprotect.pickup", true);
-    	public static Permission ATTACK = new Permission("flameprotect.attack", true);
-    	public static Permission INVULNERABLE = new Permission("flameprotect.invulnerable", false);
-    	public static Permission FEED = new Permission("flameprotect.feed", false);
-    	public static Permission ADMIN = new Permission("flameprotect.admin", true);
-    }
-	
 	public static void init(File configFile) {
 		Configuration FConfig = new Configuration(configFile);
 

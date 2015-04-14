@@ -6,8 +6,6 @@
 package com.the_beast_unleashed.flameprotect.server.log;
 
 import com.the_beast_unleashed.flameprotect.FlameProtectLogger;
-import com.the_beast_unleashed.flameprotect.server.PermissionManager;
-import com.the_beast_unleashed.flameprotect.server.PermissionManagerException;
 import com.the_beast_unleashed.flameprotect.server.ServerConfigHandler;
 
 import java.util.ArrayList;
@@ -19,7 +17,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntityCommandBlock;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentText;
 
 /**
  *
@@ -49,7 +47,7 @@ public class LogCommand implements ICommand {
     public void processCommand(ICommandSender icommandsender, String[] astring) {
         if (astring.length == 0) {
             //general help
-            icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Logging commands:\n"
+            icommandsender.addChatMessage(new ChatComponentText("Logging commands:\n"
                     + "/" + ServerConfigHandler.Lang.logCmd + " sql [true/false]\n"
                     + "/" + ServerConfigHandler.Lang.logCmd + " subscribe <n>"));
         } else if ("sql".compareTo(astring[0]) == 0) {
@@ -57,24 +55,23 @@ public class LogCommand implements ICommand {
             if (astring.length < 2
                     || ("true".compareTo(astring[1]) != 0 && "false".compareTo(astring[1]) != 0)) {
             	
-                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText(
+                icommandsender.addChatMessage(new ChatComponentText(
                 		"SQL-Logging: " + ServerConfigHandler.EnabledModules.loggingSQL + "\n"
                         + "/" + ServerConfigHandler.Lang.logCmd + " sql [true/false]"));
             } else {
             	ServerConfigHandler.EnabledModules.loggingSQL = Boolean.parseBoolean(astring[1]);
-                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("SQL-Logging: " + ServerConfigHandler.EnabledModules.loggingSQL));
+                icommandsender.addChatMessage(new ChatComponentText("SQL-Logging: " + ServerConfigHandler.EnabledModules.loggingSQL));
             }
         } else if ("console".compareTo(astring[0]) == 0) {
             //console log command
             if (astring.length < 2
                     || ("true".compareTo(astring[1]) != 0 && "false".compareTo(astring[1]) != 0)) {
             	
-                icommandsender.sendChatToPlayer(
-                		ChatMessageComponent.createFromText("Console-Logging: " + ServerConfigHandler.EnabledModules.loggingConsole + "\n"
+                icommandsender.addChatMessage(new ChatComponentText("Console-Logging: " + ServerConfigHandler.EnabledModules.loggingConsole + "\n"
                         + "/" + ServerConfigHandler.Lang.logCmd + " console [true/false]"));
             } else {
             	ServerConfigHandler.EnabledModules.loggingConsole = Boolean.parseBoolean(astring[1]);
-                icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("Console-Logging: " + ServerConfigHandler.EnabledModules.loggingConsole));
+                icommandsender.addChatMessage(new ChatComponentText("Console-Logging: " + ServerConfigHandler.EnabledModules.loggingConsole));
             }
         } else if ("subscribe".compareTo(astring[0]) == 0) {
             //subscribe command
@@ -88,7 +85,7 @@ public class LogCommand implements ICommand {
                 }
             }
             
-            icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText("/" + ServerConfigHandler.Lang.logCmd + " subscribe <n>"));
+            icommandsender.addChatMessage(new ChatComponentText("/" + ServerConfigHandler.Lang.logCmd + " subscribe <n>"));
 
         }
 
@@ -97,10 +94,9 @@ public class LogCommand implements ICommand {
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
         if (icommandsender instanceof EntityPlayer) {
-        	try {
-        		return PermissionManager.hasPermission((EntityPlayer) icommandsender, ServerConfigHandler.Perms.ADMIN);
-        	} catch (PermissionManagerException ex) {
-        		icommandsender.sendChatToPlayer(ChatMessageComponent.createFromText(ServerConfigHandler.Lang.noPermissionManager));
+        	// Is player opped?
+        	if(MinecraftServer.getServer().getConfigurationManager().func_152596_g(((EntityPlayer) icommandsender).getGameProfile())) {
+        		return true;
         	}
         }
         	

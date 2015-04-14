@@ -95,14 +95,14 @@ public class SQLHandler {
                 sqlAddEntry.setString(++i, cut(e.source, 20));
                 //sourceUUID
                 sqlAddEntry.setString(++i, cut(e.sourceUUID.toString(), 36));
+                //action
+                sqlAddEntry.setString(++i, cut(e.action, 10));                
                 //targetName
                 sqlAddEntry.setString(++i, cut(e.targetName, 40));
                 //targetDamage
                 sqlAddEntry.setInt(++i, e.targetDamage);
                 //targetN
                 sqlAddEntry.setInt(++i, e.targetN);
-                //action
-                sqlAddEntry.setString(++i, cut(e.action, 10));
                 //toolName
                 sqlAddEntry.setString(++i, cut(e.toolName, 40));
                 //toolDamage
@@ -110,7 +110,7 @@ public class SQLHandler {
                 //toolN
                 sqlAddEntry.setInt(++i, e.toolN);
                 //sneak
-                sqlAddEntry.setBoolean(++i, e.isSneaking);
+                sqlAddEntry.setInt(++i, e.isSneaking ? 1 : 0);
 
                 sqlAddEntry.executeUpdate();
 
@@ -220,14 +220,14 @@ public class SQLHandler {
                 addSQLColumn("time", "DATETIME");
                 addSQLColumn("source", "VARCHAR(20)");
                 addSQLColumn("sourceUUID", "VARCHAR(36) AFTER source");
+                addSQLColumn("action", "VARCHAR(10)");
                 addSQLColumn("targetName", "VARCHAR(40) AFTER sourceUUID");
                 addSQLColumn("targetDamage", "INT AFTER targetName");
                 addSQLColumn("targetN", "SMALLINT AFTER targetDamage");                
-                addSQLColumn("action", "VARCHAR(10)");
                 addSQLColumn("toolName", "VARCHAR(40)");
                 addSQLColumn("toolDamage", "INT");
                 addSQLColumn("toolN", "SMALLINT");
-                addSQLColumn("sneak", "BIT");
+                addSQLColumn("sneak", "SMALLINT");
 
             } else {
                 //update from previous versions, dont use break; here
@@ -254,7 +254,7 @@ public class SQLHandler {
                         addSQLColumn("toolID", "VARCHAR(10) AFTER action");
                         addSQLColumn("toolN", "SMALLINT AFTER toolID");
                         changeSQLColumn("tool", "toolName", "VARCHAR(30)");
-                        addSQLColumn("sneak", "BIT");
+                        addSQLColumn("sneak", "SMALLINT");
 
                     case 2:
                     /* Table structure:
@@ -296,14 +296,14 @@ public class SQLHandler {
                      * time DATETIME
                      * source VARCHAR(20)
                      * sourceUUID VARCHAR(36)
+                     * action VARCHAR(10)
                      * targetName VARCHAR(40)
                      * targetDamage INT
                      * targetN SMALLINT
-                     * action VARCHAR(10)
                      * toolName VARCHAR(40)
                      * toolDamage INT
                      * toolN SMALLINT
-                     * sneak BIT
+                     * sneak SMALLINT
                      */                   	
                 }
             }
@@ -311,7 +311,7 @@ public class SQLHandler {
             sql.executeUpdate("UPDATE metaInfo SET v = 3 WHERE k = 'version';");
 
             sqlAddEntry = con.prepareStatement("INSERT INTO logEntries "
-                    + "(x,y,z,world,time,source,sourceUUID,targetName,targetDamage,targetN,action,toolName,toolDamage,toolN,sneak)"
+                    + "(x,y,z,world,time,source,sourceUUID,action,targetName,targetDamage,targetN,toolName,toolDamage,toolN,sneak)"
                     + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
             thread = new SQLHandlerThread();

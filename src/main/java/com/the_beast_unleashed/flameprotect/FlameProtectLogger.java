@@ -10,8 +10,6 @@ public class FlameProtectLogger {
 	public static Logger getLogger() {
 		if (logger == null) {
 			logger = Logger.getLogger("FlameProtect");
-			logger.setParent(FMLLog.getLogger());
-			logger.setUseParentHandlers(true);
 		}
 		
 		return logger;

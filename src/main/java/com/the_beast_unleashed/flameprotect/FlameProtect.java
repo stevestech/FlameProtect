@@ -18,7 +18,7 @@ import com.the_beast_unleashed.flameprotect.server.ServerProxy;
  *
  * @author Anedaar
  */
-@Mod(modid = "FlameProtect", name = "Player logging utility", version = "0.4.0")
+@Mod(modid = "FlameProtect", name = "Player logging utility", version = "1.7.10-0.4", acceptableRemoteVersions = "*")
 
 public class FlameProtect {
 	

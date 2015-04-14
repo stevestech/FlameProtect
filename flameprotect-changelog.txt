@@ -1,5 +1,11 @@
 FlameProtect Changelog:
 
+Build 1.7.10-0.4:
+- Remove all modules apart from SQL and console logging.
+- Update to 1.7.10.
+- Log items by display name instead of item ID.
+- Record player UUID.
+
 Build 1.6.4-0.3:
 - Prevent players on server being able to use /prot and /log without being opped.
 - Add a cool-down to warning messages sent to players who are denied access.

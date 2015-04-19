@@ -156,8 +156,10 @@ public class SQLHandler {
         try {
             //establish connection
             Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://" + ServerConfigHandler.SQL.host + "/" + ServerConfigHandler.SQL.database,
-                    ServerConfigHandler.SQL.user, ServerConfigHandler.SQL.pw);
+                    "jdbc:mysql://" + ServerConfigHandler.SQL.host + ":" + ServerConfigHandler.SQL.port + "/"
+                    + ServerConfigHandler.SQL.database,
+                            ServerConfigHandler.SQL.user, ServerConfigHandler.SQL.pw);
+            
             sql = con.createStatement();
 
             //check if table exists

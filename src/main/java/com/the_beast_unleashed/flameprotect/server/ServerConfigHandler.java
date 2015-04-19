@@ -17,10 +17,8 @@ import net.minecraftforge.common.config.Configuration;
 
 public class ServerConfigHandler {
 	public static class Lang {
-	    public static String whatCmd;
-	    public static String whatCmd_default="what";	
-	    public static String logCmd;
-	    public static String logCmd_default="log";
+	    public static String flameProtectCmd;
+	    public static String flameProtectCmd_default="fp";
 	}
 	
     public static class SQL {
@@ -49,14 +47,9 @@ public class ServerConfigHandler {
 
 
 		FConfig.load();
-		
-		//what Command
-		
-		Lang.whatCmd = FConfig.get(Configuration.CATEGORY_GENERAL, "whatCommand", Lang.whatCmd_default,
-		        "Displays informations about the current held item.").getString();
-		Lang.logCmd = FConfig.get(Configuration.CATEGORY_GENERAL, "logCommand", Lang.logCmd_default,
-		        "This command is used to enable/disable logging to console or SQL.").getString();
-		
+				
+		Lang.flameProtectCmd = FConfig.get(Configuration.CATEGORY_GENERAL, "flameProtectCommand", Lang.flameProtectCmd_default,
+		        "Which command name to register for Flame Protect.").getString();		
 		
 		
 		//SQL

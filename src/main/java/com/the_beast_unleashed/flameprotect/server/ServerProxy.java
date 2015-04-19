@@ -13,7 +13,6 @@ import cpw.mods.fml.relauncher.Side;
 import com.the_beast_unleashed.flameprotect.FlameProtectLogger;
 import com.the_beast_unleashed.flameprotect.server.ServerConfigHandler;
 import com.the_beast_unleashed.flameprotect.server.log.EventLogger;
-import com.the_beast_unleashed.flameprotect.server.log.LogCommand;
 import com.the_beast_unleashed.flameprotect.server.log.LogEventHandler;
 
 import java.util.logging.Level;
@@ -39,8 +38,7 @@ public class ServerProxy {
     }
 
     public void serverLoad(FMLServerStartingEvent event) {
-        event.registerServerCommand(new LogCommand());
-        event.registerServerCommand(new WhatCommand());
+        event.registerServerCommand(new CommandFlameProtect());
     }
 
 }
